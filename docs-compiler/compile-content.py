@@ -27,7 +27,7 @@ fileNames = [
 for fileName in fileNames:
     f = open( '../bramble/' + fileName , 'r' )
     parsing = False
-    getName = False;
+    pLine = ""
 
     item = {}
     container = content
@@ -36,27 +36,13 @@ for fileName in fileNames:
     for line in f:
         sLine = line.strip()
 
-        # Set the name and kind of the current item
-        if ( getName ):
-
-            # Is a class
-            if ( sLine[:6] == 'class '):
-                itemName = sLine[6:sLine.find(' ')-7]
-                item['kind'] = 'class'
-            else:
-                itemName = sLine[:sLine.find('(')]
-                item['kind'] = 'function'
-            container['content'][itemName] = item
-            getName = False;
-
         # If currently parsing a doc string
-        elif ( parsing ):
+        if ( parsing ):
 
             # Check if parsing should finish
-            if ( sLine[:2] == '*/' ):
+            if ( sLine[-2:] == '*/' ):
                 parsing = False
-                getName = True;
-                sLine = sLine[::2]
+                sLine = sLine[:-2]
 
             # Function argument
             if ( sLine[:9] == 'argument:' ):
@@ -91,6 +77,20 @@ for fileName in fileNames:
                     if ( contentName not in container['content'] ): container['content'][contentName] = {}
                     container = container['content'][contentName]
                 if ( 'content' not in container ): container['content'] = {}
+
+                # Set the name and kind of the current item
+                if ( pLine[:6] == 'class '):
+                    itemName = pLine[6:pLine.find(' ')-7]
+                    item['kind'] = 'class'
+                else: # Is a function/method
+                    itemName = pLine[:pLine.find('(')]
+                    item['kind'] = 'function'
+
+                print( itemName , item['kind'] )
+                container['content'][itemName] = item
+
+        # Remember the previous line in the next iteration
+        pLine = sLine
 
 # Test
 f = open( 'full-content.json' , 'w' )
