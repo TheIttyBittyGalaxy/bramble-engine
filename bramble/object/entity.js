@@ -1,7 +1,8 @@
 // ENTITY COMPONENT SYSTEM ENTITY //
 class Entity {
   /*:: entityComponentSystem
-  An entity represents a game object with a collection of instansiated components. Components can be added and removed at run time. Entities may contain multiple instances of the same component type if that component permits it. Unlike traditional game objects, entities should not contain game logic. Instead they should only contain data, which should be processed in a game system.
+  An entity represents a game object with a collection of instansiated components. Components can be added and removed at run time. Entities may contain multiple instances of the same component type if that component permits it.
+  Unlike traditional game objects, entities should not contain game logic. Instead they should only contain data, which should be processed in a game system.
   implementation: partial*/
 
   constructor() {
