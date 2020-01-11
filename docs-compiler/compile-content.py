@@ -71,7 +71,7 @@ for fileName in fileNames:
                 })
 
             # Identify a function return value definition
-            if ( sLine[:7] == 'return:' ):
+            elif ( sLine[:7] == 'return:' ):
                 if ( 'returns' not in item ): item['returns'] = []
                 data = sLine[9:].strip()
                 name = data[:data.find(' ')]
@@ -123,6 +123,5 @@ for fileName in fileNames:
 
 # Save complete content to file
 f = open( 'full-content.json' , 'w' ) # This file is include in .git-ignore. Run this script locally to see the result
-f.write( json.dumps(content) )
-# f.write( json.dumps(content , indent=2, sort_keys=True) ) # Replace line above with this one in order to pretty print JSON
+f.write( json.dumps(content , indent=2, sort_keys=True) )
 f.close()
