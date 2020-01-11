@@ -68,7 +68,7 @@ def compileFunction( functName , functItem , level=1 ):
         # finalMd += '\n' + '#'*(level+1) + ' Arguments\n'
         finalMd += '\n**Arguments**\n'
 
-        finalMd += '\n' # Blank line is required before a table so that GitHub can render it
+        finalMd += '\n| Data Type | Name | Description |\n| --- | --- | --- |\n' # Blank line is required before a table so that GitHub can render it
         for arg in functItem['arguments']: finalMd += '| `' + arg['type'] + '` | `' + arg['name'] + '` | ' + arg['description'] + ' |\n'
 
     # Return values
@@ -76,7 +76,7 @@ def compileFunction( functName , functItem , level=1 ):
         # finalMd += '\n' + '#'*(level+1) + ' Returns\n'
         finalMd += '\n**Returns**\n'
 
-        finalMd += '\n' # Blank line is required before a table so that GitHub can render it
+        finalMd += '\n| Data Type | Name | Description |\n| --- | --- | --- |' # Blank line is required before a table so that GitHub can render it
         for val in functItem['returns']: finalMd += '| `' + val['type'] + '` | `' + val['name'] + '` | ' + val['description'] + ' |\n'
 
     return finalMd
