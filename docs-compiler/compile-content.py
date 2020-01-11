@@ -103,11 +103,12 @@ for fileName in fileNames:
             container = content
 
             # Navigate to new items's container
-            for contentName in sLine[4:].strip().split('/'):
-                if ( 'content' not in container ): container['content'] = {}
-                if ( contentName not in container['content'] ): container['content'][contentName] = {}
-                container = container['content'][contentName]
-                if ( 'content' not in container ): container['content'] = {}
+            if ( sLine[4:].find('/') > 0 ):
+                for contentName in sLine[4:].strip().split('/'):
+                    if ( 'content' not in container ): container['content'] = {}
+                    if ( contentName not in container['content'] ): container['content'][contentName] = {}
+                    container = container['content'][contentName]
+                    if ( 'content' not in container ): container['content'] = {}
 
             # Set the name and kind of the current item based on the previous line
             if ( pLine[:6] == 'class '):
