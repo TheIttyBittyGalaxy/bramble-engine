@@ -3,18 +3,18 @@
   "contentName": {
     "kind": "system/function/class",
     "description": "Stores a written decription of the the thing the object represents in markdown",
-    "implementation": "none/partial/complete",
+    "incomplete": true,
 
-    "arguments": [
+    "f-arguments": [
       {
         "name": "argumentName",
         "type": "The data type",
         "description": "An explaination of the argument"
       }
     ],
-    "returns": [],
+    "f-returns": [],
 
-    "content": {}
+    "contents": {}
   }
 
 }
