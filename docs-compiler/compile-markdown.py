@@ -39,14 +39,15 @@ def createTable( obj , mapping ):
     return markdown
 
 # Function to create a table of function arguments or return values
-def createFunctionValuesTable( heading , obj , level=1 ):
+def createValuesTable( heading , obj , level=1 ):
     table = copy.copy( obj )
     for row in table:
         row['name'] = '`' + row['name'] + '`'
         row['type'] = '`' + row['type'][row['type'].rfind('/')+1:] + '`'
 
     # markdown += createHeader( heading , level )
-    markdown = '\n**' + heading + '**\n'
+    markdown = ''
+    if heading != '': markdown += '\n**' + heading + '**\n'
     markdown += createTable( table , {
         'Data Type': 'type',
         'Name': 'name',
@@ -88,16 +89,35 @@ def compileSystem( itemName , item , level=1 ):
 def compileClass( itemName , item , level=1 ):
     if item['kind'] != 'class': raise RuntimeError( 'Cannot compile "' + itemName + '" as a class as it is if of kind "' + item['kind'] + '"' )
 
-    # Basic overview
-    markdown = createHeader( itemName , level )
-    if 'description' in item: markdown += re.sub( r'\n+' , '\n\n' , item['description'] ) + '\n'
+    # Markdown sections
+    openingMd = createHeader( itemName , level )
+    attributesMd = ''
+    methodsMd = createHeader( 'Methods' , level+1 )
+    areAttributes = False
+    areMethods = False
 
-    # Methods section
+    # Opening section
+    if 'description' in item: openingMd += re.sub( r'\n+' , '\n\n' , item['description'] ) + '\n'
+
+    # Attributes section
+    if 'c-attributes' in item:
+        areAttributes = True
+        attributesMd += createValuesTable( '' , item['c-attributes'] )
+
+    # Iterate through class content to construct methods section
     if 'contents' in item:
-        for subItemName in item['contents']:
-            subItem = item['contents'][subItemName]
-            if subItem['kind'] == 'function': markdown += compileFunction( itemName + '.' + subItemName , subItem , level+1 )
-            else: raise RuntimeError( 'Cannot compile ' + subItem['kind'] + ' "' + subItemName + '" (content of system "' + itemName + '") as it is not a function (method)' )
+        for childItemName in item['contents']:
+            childItem = item['contents'][childItemName]
+            if childItem['kind'] == 'function':
+                areMethods = True
+                methodsMd += compileFunction( childItemName , childItem , level+2 )
+            else:
+                raise RuntimeError( 'Cannot compile ' + item['kind'] + ' "' + childItemName + '" (content of class "' + itemName + '") as it is not a function or attribute' )
+
+    # Output final result
+    markdown = openingMd
+    if areAttributes: markdown += attributesMd
+    if areMethods: markdown += methodsMd
 
     return markdown
 
@@ -115,8 +135,8 @@ def compileFunction( itemName , item , level=1 ):
     if 'description' in item: markdown += formatParagraphs( item['description'] )
 
     # Argument and return value tables
-    if 'f-arguments' in item: markdown += createFunctionValuesTable( 'Arguments' , item['f-arguments'] )
-    if 'f-returns' in item: markdown += createFunctionValuesTable( 'Return values' , item['f-returns'] )
+    if 'f-arguments' in item: markdown += createValuesTable( 'Arguments' , item['f-arguments'] )
+    if 'f-returns' in item: markdown += createValuesTable( 'Return values' , item['f-returns'] )
 
     return markdown
 

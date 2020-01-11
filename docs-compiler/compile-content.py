@@ -34,6 +34,19 @@ fileNames = [
     'components.js',
 ]
 
+# Utility function for parsing arguemnts, return values, and attributes in doc strings
+def parseDocStrValue( data ):
+    data = data.strip()
+    name = data[:data.find(' ')]
+    data = data[data.find(' ')+1:]
+    type = data[:data.find(' ')]
+    data = data[data.find(' ')+1:]
+    return {
+        'name': name,
+        'type': type,
+        'description': data
+    }
+
 # For each file to be documented, load the file and scan each line looking for doc strings
 for fileName in fileNames:
     parsing = False # Indicates if a doc string is currently being parsed
@@ -58,32 +71,17 @@ for fileName in fileNames:
             # Identify a function argument definition
             if sLine[:9] == 'argument:':
                 if 'f-arguments' not in item: item['f-arguments'] = []
-                data = sLine[9:].strip()
-                name = data[:data.find(' ')]
-                data = data[data.find(' ')+1:]
-                type = data[:data.find(' ')]
-                data = data[data.find(' ')+1:]
-                description = data
-                item['f-arguments'].append({
-                    'name': name,
-                    'type': type,
-                    'description': description
-                })
+                item['f-arguments'].append( parseDocStrValue( sLine[9:] ) )
 
             # Identify a function return value definition
             elif sLine[:7] == 'return:':
                 if 'f-returns' not in item: item['f-returns'] = []
-                data = sLine[7:].strip()
-                name = data[:data.find(' ')]
-                data = data[data.find(' ')+1:]
-                type = data[:data.find(' ')]
-                data = data[data.find(' ')+1:]
-                description = data
-                item['f-returns'].append({
-                    'name': name,
-                    'type': type,
-                    'description': description
-                })
+                item['f-returns'].append( parseDocStrValue( sLine[7:] ) )
+
+            # Identify a class attribute definition
+            elif sLine[:10] == 'attribute:':
+                if 'c-attributes' not in item: item['c-attributes'] = []
+                item['c-attributes'].append( parseDocStrValue( sLine[10:] ) )
 
             # Identify an 'incomplete' tag
             elif sLine[:10] == 'incomplete':
