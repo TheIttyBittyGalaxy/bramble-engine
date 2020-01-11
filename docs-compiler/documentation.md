@@ -1,7 +1,7 @@
-# assetLoader
+# Asset Loader
 The asset loader is used to automatically track the loading of all of the game's image and sound assets.
 
-# entityComponentSystem
+# Entity Component System
 Bramble has a built in ECS. Entities are objects that inherit from the `Entity` class. Components are are objects that inherit from a child class of the 'Component' class
 
 ## Classes
