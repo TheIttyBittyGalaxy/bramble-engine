@@ -34,6 +34,19 @@ fileNames = [
     'components.js',
 ]
 
+# Utility function for parsing arguemnts, return values, and attributes in doc strings
+def parseDocStrValue( data ):
+    data = data.strip()
+    name = data[:data.find(' ')]
+    data = data[data.find(' ')+1:]
+    type = data[:data.find(' ')]
+    data = data[data.find(' ')+1:]
+    return {
+        'name': name,
+        'type': type,
+        'description': data
+    }
+
 # For each file to be documented, load the file and scan each line looking for doc strings
 for fileName in fileNames:
     parsing = False # Indicates if a doc string is currently being parsed
@@ -48,54 +61,39 @@ for fileName in fileNames:
         sLine = line.strip()
 
         # When parsing doc string
-        if ( parsing ):
+        if parsing:
 
             # Check if parsing should finish
-            if ( sLine[-2:] == '*/' ):
+            if sLine[-2:] == '*/':
                 parsing = False
                 sLine = sLine[:-2]
 
             # Identify a function argument definition
-            if ( sLine[:9] == 'argument:' ):
-                if ( 'arguments' not in item ): item['arguments'] = []
-                data = sLine[9:].strip()
-                name = data[:data.find(' ')]
-                data = data[data.find(' ')+1:]
-                type = data[:data.find(' ')]
-                data = data[data.find(' ')+1:]
-                description = data
-                item['arguments'].append({
-                    'name': name,
-                    'type': type,
-                    'description': description
-                })
+            if sLine[:9] == 'argument:':
+                if 'f-arguments' not in item: item['f-arguments'] = []
+                item['f-arguments'].append( parseDocStrValue( sLine[9:] ) )
 
             # Identify a function return value definition
-            elif ( sLine[:7] == 'return:' ):
-                if ( 'returns' not in item ): item['returns'] = []
-                data = sLine[9:].strip()
-                name = data[:data.find(' ')]
-                data = data[data.find(' ')+1:]
-                type = data[:data.find(' ')]
-                data = data[data.find(' ')+1:]
-                description = data
-                item['returns'].append({
-                    'name': name,
-                    'type': type,
-                    'description': description
-                })
+            elif sLine[:7] == 'return:':
+                if 'f-returns' not in item: item['f-returns'] = []
+                item['f-returns'].append( parseDocStrValue( sLine[7:] ) )
 
-            # Identify an implementation definition
-            elif ( sLine[:15] == 'implementation:' ):
-                item['implementation'] = sLine[15:].strip()
+            # Identify a class attribute definition
+            elif sLine[:10] == 'attribute:':
+                if 'c-attributes' not in item: item['c-attributes'] = []
+                item['c-attributes'].append( parseDocStrValue( sLine[10:] ) )
+
+            # Identify an 'incomplete' tag
+            elif sLine[:10] == 'incomplete':
+                item['incomplete'] = True
 
             # Description definition
             else:
-                if ( 'description' not in item ): item['description'] = sLine
+                if 'description' not in item: item['description'] = sLine
                 else: item['description'] += '\n' + sLine
 
         # When starting new doc string
-        elif ( sLine[:4] == '/*::' ):
+        elif sLine[:4] == '/*::':
 
             # Reset parser
             parsing = True
@@ -103,12 +101,12 @@ for fileName in fileNames:
             container = content
 
             # Navigate to new items's container
-            if ( sLine[4:].find('/') > 0 ):
+            if sLine[4:].strip() != '':
                 for contentName in sLine[4:].strip().split('/'):
-                    if ( 'content' not in container ): container['content'] = {}
-                    if ( contentName not in container['content'] ): container['content'][contentName] = {}
-                    container = container['content'][contentName]
-                    if ( 'content' not in container ): container['content'] = {}
+                    if 'contents' not in container: container['contents'] = {}
+                    if contentName not in container['contents']: container['contents'][contentName] = {}
+                    container = container['contents'][contentName]
+                    if 'contents' not in container: container['contents'] = {}
 
             # Set the name and kind of the current item based on the previous line
             if ( pLine[:6] == 'class '):
@@ -117,7 +115,7 @@ for fileName in fileNames:
             else: # Is a function/method
                 itemName = pLine[:pLine.find('(')]
                 item['kind'] = 'function'
-            container['content'][itemName] = item
+            container['contents'][itemName] = item
 
         # Remember the previous line for the next iteration
         pLine = sLine

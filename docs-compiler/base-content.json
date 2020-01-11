@@ -1,5 +1,5 @@
 {
-  "content": {
+  "contents": {
     "entityComponentSystem": {
       "kind": "system",
       "description": "Bramble has a built in ECS. Entities are objects that inherit from the `Entity` class. Components are are objects that inherit from a child class of the 'Component' class"
