@@ -74,16 +74,16 @@ def compileSystem( itemName , item , level=1 ):
     if 'contents' in item:
         for childItemName in item['contents']:
             childItem = item['contents'][childItemName]
-            if   ( childItem['kind'] == 'function' ): areFunctions = True; functionsMd += compileFunction( childItemName , childItem , level+2 )
+            if   childItem['kind'] == 'function': areFunctions = True; functionsMd += compileFunction( childItemName , childItem , level+2 )
             elif childItem['kind'] == 'class':    areClasses = True;   classesMd += compileClass( childItemName , childItem , level+1 )
             else: raise RuntimeError( 'Cannot compile ' + item['kind'] + ' "' + childItemName + '" (content of system "' + itemName + '") as it is not a function or class' )
 
     # Output final result
-    finalMd = openingMd
-    if areFunctions: finalMd += functionsMd
-    if areClasses: finalMd += classesMd
+    markdown = openingMd
+    if areFunctions: markdown += functionsMd
+    if areClasses: markdown += classesMd
 
-    return finalMd
+    return markdown
 
 # COMPILE CLASS #
 def compileClass( itemName , item , level=1 ):
