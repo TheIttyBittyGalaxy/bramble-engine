@@ -28,7 +28,7 @@ def compileSystem( systemName , systemItem ):
             # Item is a function
             if ( item['kind'] == 'function' ):
                 areFunctions = True
-                functionsMd += compileFunction( itemName , name , 3 )
+                functionsMd += compileFunction( itemName , item , 3 )
 
             # Item is a class
             elif ( item['kind'] == 'class' ):
