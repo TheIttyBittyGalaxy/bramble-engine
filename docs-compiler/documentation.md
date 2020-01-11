@@ -14,8 +14,6 @@ Unlike traditional game objects, entities should not contain game logic. Instead
 #### Entity.addComponent
 Adds the given component to the entiy
 
-argument: comp entityComponentSystem/Component The component that will be added to the entity
-
 **Arguments**
 
 | Data Type | Name | Description |
@@ -27,8 +25,6 @@ Creates a new entity
 
 #### Entity.removeComponent
 Removes the specified component from the entity
-
-argument: comp entityComponentSystem/Component The component that will be removed from the entity
 
 **Arguments**
 
