@@ -106,7 +106,12 @@ def compileFunction( itemName , item , level=1 ):
     if ( item['kind'] != 'function' ): raise RuntimeError( 'Cannot compile "' + itemName + '" as a function as it is if of kind "' + item['kind'] + '"' )
 
     # Basic overview
-    markdown = createHeader( itemName , level )
+    heading = itemName + '('
+    if ( 'f-arguments' in item ):
+        heading += ' '
+        for arg in item['f-arguments']: heading += arg['name'] + (' ' if arg == item['f-arguments'][-1] else ', ')
+    heading += ')'
+    markdown = createHeader( heading , level )
     if ( 'description' in item ): markdown += formatParagraphs( item['description'] )
 
     # Argument and return value tables
