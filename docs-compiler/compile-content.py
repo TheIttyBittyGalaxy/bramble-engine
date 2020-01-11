@@ -1,5 +1,4 @@
 import json
-from pprint import pprint
 
 #    JavaScript doc string syntax
 #    /* parentContentPath
@@ -124,6 +123,6 @@ for fileName in fileNames:
 
 # Save complete content to file
 f = open( 'full-content.json' , 'w' ) # This file is include in .git-ignore. Run this script locally to see the result
-# f.write( json.dumps(content) )
-f.write( json.dumps(content , indent=2, sort_keys=True) ) # Replace line above with this one in order to pretty print JSON
+f.write( json.dumps(content) )
+# f.write( json.dumps(content , indent=2, sort_keys=True) ) # Replace line above with this one in order to pretty print JSON
 f.close()
