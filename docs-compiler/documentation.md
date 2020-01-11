@@ -19,7 +19,7 @@ argument: comp entityComponentSystem/Component The component that will be added 
 **Arguments**
 
 | Data Type | Name | Description |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `entityComponentSystem/Component` | `comp` | The component that will be added to the entity |
 
 #### Entity.constructor
@@ -33,5 +33,5 @@ argument: comp entityComponentSystem/Component The component that will be remove
 **Arguments**
 
 | Data Type | Name | Description |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `entityComponentSystem/Component` | `comp` | The component that will be removed from the entity |

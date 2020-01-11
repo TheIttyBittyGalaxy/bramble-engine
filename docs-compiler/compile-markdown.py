@@ -8,9 +8,7 @@ f.close()
 
 # Function to compile a system content item into markdown
 def compileSystem( systemName , systemItem ):
-    if ( systemItem['kind'] != 'system' ):
-        print( 'notice: Cannot compile "' + systemName + '" as it is not a system' )
-        return ''
+    if ( systemItem['kind'] != 'system' ): raise RuntimeError( 'Cannot compile "' + systemName + '" as a system as it is if of type "' + systemItem['kind'] + '"' )
 
     functionsMd = '\n## Functions\n'
     areFunctions = False
@@ -42,11 +40,11 @@ def compileSystem( systemName , systemItem ):
                         if ( subItem['kind'] == 'function' ):
                             classesMd += compileFunction( itemName + '.' + subItemName , subItem , 4 )
                         else:
-                            print( 'notice: Cannot compile "' + subItemName + '" as it is not a function' )
+                            raise RuntimeError( 'Cannot compile ' + subItem['kind'] + ' "' + subItemName + '" (content of system "' + itemName + '") as it is not a function (method)' )
 
             # Item is of invalid kind
             else:
-                print( 'notice: Cannot compile "' + itemName + '" as it is not a function or class' )
+                raise RuntimeError( 'Cannot compile ' + item['kind'] + ' "' + itemName + '" (content of system "' + systemName + '") as it is not a function or class' )
 
     # Output final result
     finalMd = '\n# ' + systemName + '\n'
@@ -58,6 +56,7 @@ def compileSystem( systemName , systemItem ):
 
 # Function to compile function content item into markdown
 def compileFunction( functName , functItem , level=1 ):
+    if ( functItem['kind'] != 'function' ): raise RuntimeError( 'Cannot compile "' + functName + '" as a function as it is if of type "' + functItem['kind'] + '"' )
 
     # Basic overview
     finalMd = '\n' + '#'*(level) + ' ' + functName + '\n'
@@ -68,7 +67,7 @@ def compileFunction( functName , functItem , level=1 ):
         # finalMd += '\n' + '#'*(level+1) + ' Arguments\n'
         finalMd += '\n**Arguments**\n'
 
-        finalMd += '\n| Data Type | Name | Description |\n| --- | --- | --- |\n' # Blank line is required before a table so that GitHub can render it
+        finalMd += '\n| Data Type | Name | Description |\n| :--- | :--- | :--- |\n' # Blank line is required before a table so that GitHub can render it
         for arg in functItem['arguments']: finalMd += '| `' + arg['type'] + '` | `' + arg['name'] + '` | ' + arg['description'] + ' |\n'
 
     # Return values
@@ -76,7 +75,7 @@ def compileFunction( functName , functItem , level=1 ):
         # finalMd += '\n' + '#'*(level+1) + ' Returns\n'
         finalMd += '\n**Returns**\n'
 
-        finalMd += '\n| Data Type | Name | Description |\n| --- | --- | --- |' # Blank line is required before a table so that GitHub can render it
+        finalMd += '\n| Data Type | Name | Description |\n| :--- | :--- | :--- |' # Blank line is required before a table so that GitHub can render it
         for val in functItem['returns']: finalMd += '| `' + val['type'] + '` | `' + val['name'] + '` | ' + val['description'] + ' |\n'
 
     return finalMd
