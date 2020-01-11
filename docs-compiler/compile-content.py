@@ -37,7 +37,7 @@ fileNames = [
 # For each file to be documented, load the file and scan each line looking for doc strings
 for fileName in fileNames:
     parsing = False # Indicates if a doc string is currently being parsed
-    pLine = "" # The previous line of the file
+    pLine = '' # The previous line of the file
     item = {} # The item (e.g. class) currently being parsed
     container = content # The container of the current item
 
@@ -65,9 +65,9 @@ for fileName in fileNames:
                 data = data[data.find(' ')+1:]
                 description = data
                 item['arguments'].append({
-                    "name": name,
-                    "type": type,
-                    "description": description
+                    'name': name,
+                    'type': type,
+                    'description': description
                 })
 
             # Identify a function return value definition
@@ -80,9 +80,9 @@ for fileName in fileNames:
                 data = data[data.find(' ')+1:]
                 description = data
                 item['returns'].append({
-                    "name": name,
-                    "type": type,
-                    "description": description
+                    'name': name,
+                    'type': type,
+                    'description': description
                 })
 
             # Identify an implementation definition
