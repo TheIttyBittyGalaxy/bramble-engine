@@ -57,14 +57,14 @@ for fileName in fileNames:
 
             # Identify a function argument definition
             if ( sLine[:9] == 'argument:' ):
-                if ( 'arguments' not in item ): item['arguments'] = []
+                if ( 'f-arguments' not in item ): item['f-arguments'] = []
                 data = sLine[9:].strip()
                 name = data[:data.find(' ')]
                 data = data[data.find(' ')+1:]
                 type = data[:data.find(' ')]
                 data = data[data.find(' ')+1:]
                 description = data
-                item['arguments'].append({
+                item['f-arguments'].append({
                     'name': name,
                     'type': type,
                     'description': description
@@ -72,22 +72,22 @@ for fileName in fileNames:
 
             # Identify a function return value definition
             elif ( sLine[:7] == 'return:' ):
-                if ( 'returns' not in item ): item['returns'] = []
-                data = sLine[9:].strip()
+                if ( 'f-returns' not in item ): item['f-returns'] = []
+                data = sLine[7:].strip()
                 name = data[:data.find(' ')]
                 data = data[data.find(' ')+1:]
                 type = data[:data.find(' ')]
                 data = data[data.find(' ')+1:]
                 description = data
-                item['returns'].append({
+                item['f-returns'].append({
                     'name': name,
                     'type': type,
                     'description': description
                 })
 
-            # Identify an implementation definition
-            elif ( sLine[:15] == 'implementation:' ):
-                item['implementation'] = sLine[15:].strip()
+            # Identify an 'incomplete' tag
+            elif ( sLine[:10] == 'incomplete' ):
+                item['incomplete'] = True
 
             # Description definition
             else:
@@ -103,12 +103,12 @@ for fileName in fileNames:
             container = content
 
             # Navigate to new items's container
-            if ( sLine[4:].find('/') > 0 ):
+            if ( sLine[4:].strip() != '' ):
                 for contentName in sLine[4:].strip().split('/'):
-                    if ( 'content' not in container ): container['content'] = {}
-                    if ( contentName not in container['content'] ): container['content'][contentName] = {}
-                    container = container['content'][contentName]
-                    if ( 'content' not in container ): container['content'] = {}
+                    if ( 'contents' not in container ): container['contents'] = {}
+                    if ( contentName not in container['contents'] ): container['contents'][contentName] = {}
+                    container = container['contents'][contentName]
+                    if ( 'contents' not in container ): container['contents'] = {}
 
             # Set the name and kind of the current item based on the previous line
             if ( pLine[:6] == 'class '):
@@ -117,7 +117,7 @@ for fileName in fileNames:
             else: # Is a function/method
                 itemName = pLine[:pLine.find('(')]
                 item['kind'] = 'function'
-            container['content'][itemName] = item
+            container['contents'][itemName] = item
 
         # Remember the previous line for the next iteration
         pLine = sLine
