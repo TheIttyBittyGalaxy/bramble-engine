@@ -48,16 +48,16 @@ for fileName in fileNames:
         sLine = line.strip()
 
         # When parsing doc string
-        if ( parsing ):
+        if parsing:
 
             # Check if parsing should finish
-            if ( sLine[-2:] == '*/' ):
+            if sLine[-2:] == '*/':
                 parsing = False
                 sLine = sLine[:-2]
 
             # Identify a function argument definition
-            if ( sLine[:9] == 'argument:' ):
-                if ( 'f-arguments' not in item ): item['f-arguments'] = []
+            if sLine[:9] == 'argument:':
+                if 'f-arguments' not in item: item['f-arguments'] = []
                 data = sLine[9:].strip()
                 name = data[:data.find(' ')]
                 data = data[data.find(' ')+1:]
@@ -71,8 +71,8 @@ for fileName in fileNames:
                 })
 
             # Identify a function return value definition
-            elif ( sLine[:7] == 'return:' ):
-                if ( 'f-returns' not in item ): item['f-returns'] = []
+            elif sLine[:7] == 'return:':
+                if 'f-returns' not in item: item['f-returns'] = []
                 data = sLine[7:].strip()
                 name = data[:data.find(' ')]
                 data = data[data.find(' ')+1:]
@@ -86,16 +86,16 @@ for fileName in fileNames:
                 })
 
             # Identify an 'incomplete' tag
-            elif ( sLine[:10] == 'incomplete' ):
+            elif sLine[:10] == 'incomplete':
                 item['incomplete'] = True
 
             # Description definition
             else:
-                if ( 'description' not in item ): item['description'] = sLine
+                if 'description' not in item: item['description'] = sLine
                 else: item['description'] += '\n' + sLine
 
         # When starting new doc string
-        elif ( sLine[:4] == '/*::' ):
+        elif sLine[:4] == '/*::':
 
             # Reset parser
             parsing = True
@@ -103,12 +103,12 @@ for fileName in fileNames:
             container = content
 
             # Navigate to new items's container
-            if ( sLine[4:].strip() != '' ):
+            if sLine[4:].strip() != '':
                 for contentName in sLine[4:].strip().split('/'):
-                    if ( 'contents' not in container ): container['contents'] = {}
-                    if ( contentName not in container['contents'] ): container['contents'][contentName] = {}
+                    if 'contents' not in container: container['contents'] = {}
+                    if contentName not in container['contents']: container['contents'][contentName] = {}
                     container = container['contents'][contentName]
-                    if ( 'contents' not in container ): container['contents'] = {}
+                    if 'contents' not in container: container['contents'] = {}
 
             # Set the name and kind of the current item based on the previous line
             if ( pLine[:6] == 'class '):

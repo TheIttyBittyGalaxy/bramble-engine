@@ -57,7 +57,7 @@ def createFunctionValuesTable( heading , obj , level=1 ):
 
 # COMPILE SYSTEM #
 def compileSystem( itemName , item , level=1 ):
-    if ( item['kind'] != 'system' ): raise RuntimeError( 'Cannot compile "' + itemName + '" as a system as it is if of kind "' + item['kind'] + '"' )
+    if item['kind'] != 'system': raise RuntimeError( 'Cannot compile "' + itemName + '" as a system as it is if of kind "' + item['kind'] + '"' )
 
     # Markdown sections
     openingMd = createHeader( itemName , level , True )
@@ -67,56 +67,56 @@ def compileSystem( itemName , item , level=1 ):
     areClasses = False
 
     # Opening section
-    if ( 'description' in item ): openingMd += formatParagraphs( item['description'] )
+    if 'description' in item: openingMd += formatParagraphs( item['description'] )
 
     # Iterate through system content
-    if ( 'contents' in item ):
+    if 'contents' in item:
         for childItemName in item['contents']:
             childItem = item['contents'][childItemName]
             if   ( childItem['kind'] == 'function' ): areFunctions = True; functionsMd += compileFunction( childItemName , childItem , level+2 )
-            elif ( childItem['kind'] == 'class' ):    areClasses = True;   classesMd += compileClass( childItemName , childItem , level+1 )
+            elif childItem['kind'] == 'class':    areClasses = True;   classesMd += compileClass( childItemName , childItem , level+1 )
             else: raise RuntimeError( 'Cannot compile ' + item['kind'] + ' "' + childItemName + '" (content of system "' + itemName + '") as it is not a function or class' )
 
     # Output final result
     finalMd = openingMd
-    if ( areFunctions ): finalMd += functionsMd
-    if ( areClasses ): finalMd += classesMd
+    if areFunctions: finalMd += functionsMd
+    if areClasses: finalMd += classesMd
 
     return finalMd
 
 # COMPILE CLASS #
 def compileClass( itemName , item , level=1 ):
-    if ( item['kind'] != 'class' ): raise RuntimeError( 'Cannot compile "' + itemName + '" as a class as it is if of kind "' + item['kind'] + '"' )
+    if item['kind'] != 'class': raise RuntimeError( 'Cannot compile "' + itemName + '" as a class as it is if of kind "' + item['kind'] + '"' )
 
     # Basic overview
     markdown = createHeader( itemName , level )
-    if ( 'description' in item ): markdown += re.sub( r'\n+' , '\n\n' , item['description'] ) + '\n'
+    if 'description' in item: markdown += re.sub( r'\n+' , '\n\n' , item['description'] ) + '\n'
 
     # Methods section
-    if ( 'contents' in item ):
+    if 'contents' in item:
         for subItemName in item['contents']:
             subItem = item['contents'][subItemName]
-            if ( subItem['kind'] == 'function' ): markdown += compileFunction( itemName + '.' + subItemName , subItem , level+1 )
+            if subItem['kind'] == 'function': markdown += compileFunction( itemName + '.' + subItemName , subItem , level+1 )
             else: raise RuntimeError( 'Cannot compile ' + subItem['kind'] + ' "' + subItemName + '" (content of system "' + itemName + '") as it is not a function (method)' )
 
     return markdown
 
 # COMPILE FUNCTION #
 def compileFunction( itemName , item , level=1 ):
-    if ( item['kind'] != 'function' ): raise RuntimeError( 'Cannot compile "' + itemName + '" as a function as it is if of kind "' + item['kind'] + '"' )
+    if item['kind'] != 'function': raise RuntimeError( 'Cannot compile "' + itemName + '" as a function as it is if of kind "' + item['kind'] + '"' )
 
     # Basic overview
     heading = itemName + '('
-    if ( 'f-arguments' in item ):
+    if 'f-arguments' in item:
         heading += ' '
         for arg in item['f-arguments']: heading += arg['name'] + (' ' if arg == item['f-arguments'][-1] else ', ')
     heading += ')'
     markdown = createHeader( heading , level )
-    if ( 'description' in item ): markdown += formatParagraphs( item['description'] )
+    if 'description' in item: markdown += formatParagraphs( item['description'] )
 
     # Argument and return value tables
-    if ( 'f-arguments' in item ): markdown += createFunctionValuesTable( 'Arguments' , item['f-arguments'] )
-    if ( 'f-returns' in item ): markdown += createFunctionValuesTable( 'Return values' , item['f-returns'] )
+    if 'f-arguments' in item: markdown += createFunctionValuesTable( 'Arguments' , item['f-arguments'] )
+    if 'f-returns' in item: markdown += createFunctionValuesTable( 'Return values' , item['f-returns'] )
 
     return markdown
 
@@ -124,9 +124,9 @@ def compileFunction( itemName , item , level=1 ):
 docMd = ''
 for systemName in content['contents']:
     itemKind = content['contents'][systemName]['kind']
-    if ( itemKind == "system" ): docMd += compileSystem( systemName , content['contents'][systemName] )
-    elif ( itemKind == "class" ): docMd += compileClass( systemName , content['contents'][systemName] )
-    elif ( itemKind == "function" ): docMd += compileFunction( systemName , content['contents'][systemName] )
+    if itemKind == "system": docMd += compileSystem( systemName , content['contents'][systemName] )
+    elif itemKind == "class": docMd += compileClass( systemName , content['contents'][systemName] )
+    elif itemKind == "function": docMd += compileFunction( systemName , content['contents'][systemName] )
 docMd = docMd.strip()
 
 # Save complete markdown to file
