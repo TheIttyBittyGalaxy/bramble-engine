@@ -7,4 +7,4 @@ Bramble is a small game engine I am developing so I can use it in game jams. __(
 * The engine implements an asset loading system
 
 ## Can I help?
-Sure! If you've spent long enough on the internet to find this little corner of it, you must need something to do! Jump onto the development branch to see where I'm at at the moment.
+Sure thing! If you've got a contribution you want to make feel free to post an issue to reach out to me, or just fork the project and get going!
