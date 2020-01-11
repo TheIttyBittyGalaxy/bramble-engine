@@ -6,6 +6,11 @@ f = open( 'full-content.json' , 'r' ) # This file is include in .git-ignore
 content = json.loads( f.read() ) # The json object representing all documented content
 f.close()
 
+# Function to convert a string from camel case to a capitalised string
+# e.g. "entityComponentSystem" -> "Entity Component System"
+def deCamelCase( s ):
+    return re.sub( r'(.)([A-Z])',r'\1 \2',s).title()
+
 # Function to compile a system content item into markdown
 def compileSystem( systemName , systemItem ):
     if ( systemItem['kind'] != 'system' ): raise RuntimeError( 'Cannot compile "' + systemName + '" as a system as it is if of type "' + systemItem['kind'] + '"' )
@@ -47,7 +52,7 @@ def compileSystem( systemName , systemItem ):
                 raise RuntimeError( 'Cannot compile ' + item['kind'] + ' "' + itemName + '" (content of system "' + systemName + '") as it is not a function or class' )
 
     # Output final result
-    finalMd = '\n# ' + systemName + '\n'
+    finalMd = '\n# ' + deCamelCase(systemName) + '\n'
     if ( 'description' in systemItem ): finalMd += systemItem['description'] + '\n'
     if ( areFunctions ): finalMd += functionsMd + '\n'
     if ( areClasses ): finalMd += classesMd + '\n'
