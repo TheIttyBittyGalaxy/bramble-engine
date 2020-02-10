@@ -41,7 +41,7 @@ bramble.draw.line = function ( x1 , y1 , x2 , y2 , color ) {
 }
 
 // Vector
-bramble.draw.vector = function ( v , color , x , y ) {
+bramble.draw.vec = function ( v , color , x , y ) {
 	x = x || 0;
 	y = y || 0;
 	bramble.draw.line( x , y , x+v.x , y+v.y , color );
