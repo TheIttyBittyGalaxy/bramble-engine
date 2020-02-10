@@ -141,58 +141,6 @@ game.state.switch = function ( state ) {
   state.start();
 }
 
-// Generic game state object
-class GameState {
-  constructor() {
-    this._eventCanPass = {};
-  }
-
-  enableEventPass( event )  { this._eventCanPass[event] = true }
-  disableEventPass( event ) { delete this._eventCanPass[event] }
-  canEventPass( event )     { return this._eventCanPass[event] }
-
-  get focused() { return game.state.current == this }
-
-  start() {}
-  resume() {}
-  leave() {}
-  end() {}
-
-  /*
-  // Bramble event callbacks //
-  update( dt ) {}
-  draw() {}
-
-  keyDown( key ) {}
-  keyUp( key ) {}
-  mouseDown( x , y , button ) {}
-  mouseUp( x , y , button ) {}
-  mouseMove( x , y ) {}
-  */
-}
-
-// Game state used for the generic loading screen
-class BrambleLoadingState extends GameState {
-  constructor() {
-    super();
-    this.barX = bramble.canvas.width *.2;
-    this.barW = bramble.canvas.width *.6;
-    this.barY = bramble.canvas.height/2 -2;
-    this.barH = 4;
-    this.progress = 0;
-  }
-
-  update() {
-    this.progress = assets.loader.loadedAssetCount / assets.loader.totalAssetCount;
-    if ( progress == 1 && this.focused ) game.state.end();
-  }
-
-  draw() {
-    bramble.draw.rectangle( this.barX , this.barY , this.barW , this.barH , "fill" , "#666" );
-    bramble.draw.rectangle( this.barX , this.barY , this.barW * progress , this.barH , "fill" , "#EEE" );    
-  }
-}
-
 // MAIN LOOP //
 bramble.lastTimestamp
 bramble.loop = function ( timestamp ) {
@@ -359,47 +307,63 @@ class Vector {
   mul(c) { return new Vector( this.x *c , this.y *c ) }
   div(c) { return new Vector( this.x /c , this.y /c ) }
   dot(v) { return this.x*v.x + this.y*v.y }
-
   angleTo(v) { return Math.acos( this.dot(v) / (this.m*v.m) ) }
+
+}
+
+// GAME STATE SYSTEM STATE //
+class GameState {
+  constructor() {
+    this._eventCanPass = {};
+  }
+
+  enableEventPass( event )  { this._eventCanPass[event] = true }
+  disableEventPass( event ) { delete this._eventCanPass[event] }
+  canEventPass( event )     { return this._eventCanPass[event] }
+
+  get focused() { return game.state.current == this }
+
+  start() {}
+  resume() {}
+  leave() {}
+  end() {}
+
+  // Bramble event callbacks //
+  // update( dt ) {}
+  // draw() {}
+
+  // keyDown( key ) {}
+  // keyUp( key ) {}
+  // mouseDown( x , y , button ) {}
+  // mouseUp( x , y , button ) {}
+  // mouseMove( x , y ) {}
 }
 
 // ENTITY COMPONENT SYSTEM ENTITY //
 class Entity {
-  /*:: entityComponentSystem
-  An entity represents a game object with a collection of instansiated components. Components can be added and removed at run time. Entities may contain multiple instances of the same component type if that component permits it.
-  Unlike traditional game objects, entities should not contain game logic. Instead they should only contain data, which should be processed in a game system.
-  implementation: partial*/
-
-  constructor() {
-    /*:: entityComponentSystem/Entity
-    Creates a new entity
-    implementation: none*/
-
-  }
+  constructor() {}
 
   addComponent( comp ) {
-    /*:: entityComponentSystem/Entity
-    Adds the given component to the entiy
-    argument: comp entityComponentSystem/Component The component that will be added to the entity
-    implementation: partial*/
     this[comp.name] = comp;
     comp.parent = this;
   }
 
   removeComponent( compName ) {
-    /*:: entityComponentSystem/Entity
-    Removes the specified component from the entity
-    argument: comp entityComponentSystem/Component The component that will be removed from the entity
-    implementation: partial*/
     delete this[compName]
   }
 }
 
 // ENTITY COMPONENT SYSTEM COMPONENT //
 class Component {
-  constructor( name ) { this.name = name }
+  constructor( name ) {
+    this.name = name
+  }
 }
 
+// STANDARD COMPONENTS //
+
+// Position component
+// Used to store the position of an entity as a vector
 class PositionComp extends Component {
   constructor( x , y ) {
     super( "pos" );
@@ -410,5 +374,30 @@ class PositionComp extends Component {
   get y() { return this.vec.y }
   set x(v) { this.vec.x = v }
   set y(v) { this.vec.y = v }
+}
+
+// STANDARD STATES //
+
+// Bramble Loading State
+// Used as the default loading screen when loading the game's assets
+class BrambleLoadingState extends GameState {
+  constructor() {
+    super();
+    this.barX = bramble.canvas.width *.2;
+    this.barW = bramble.canvas.width *.6;
+    this.barY = bramble.canvas.height/2 -2;
+    this.barH = 4;
+    this.progress = 0;
+  }
+
+  update() {
+    this.progress = assets.loader.loadedAssetCount / assets.loader.totalAssetCount;
+    if ( progress == 1 && this.focused ) game.state.end();
+  }
+
+  draw() {
+    bramble.draw.rectangle( this.barX , this.barY , this.barW , this.barH , "fill" , "#666" );
+    bramble.draw.rectangle( this.barX , this.barY , this.barW * progress , this.barH , "fill" , "#EEE" );
+  }
 }
 

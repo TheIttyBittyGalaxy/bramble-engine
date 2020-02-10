@@ -1,6 +1,6 @@
 import os
 
-# Which files should be imported and in which order
+# Which files should be imported and and in which order
 fileNames = [
     "core/init.js",
     "core/assets.js",
@@ -12,10 +12,12 @@ fileNames = [
     "core/input.js",
 
     "object/vector.js",
+    "object/state.js",
     "object/entity.js",
     "object/component.js",
 
     "components.js",
+    "states.js",
 ]
 
 # Generate content of engine file

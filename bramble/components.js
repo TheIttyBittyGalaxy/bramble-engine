@@ -1,3 +1,7 @@
+// STANDARD COMPONENTS //
+
+// Position component
+// Used to store the position of an entity as a vector
 class PositionComp extends Component {
   constructor( x , y ) {
     super( "pos" );
