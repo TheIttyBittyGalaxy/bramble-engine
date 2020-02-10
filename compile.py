@@ -1,4 +1,5 @@
 import os
+import re
 
 # Which files should be imported and and in which order
 fileNames = [
@@ -27,6 +28,11 @@ for fileName in fileNames:
     f = open( "bramble/" + fileName , "r" )
     engineContent += f.read() + "\n"
     f.close()
+
+# Modify content
+engineContent = re.sub( r"//.*\n" , "\n" , engineContent )
+engineContent = re.sub( r"\n\s*\n" , "\n" , engineContent )
+engineContent = engineContent.strip()
 
 # Write content to file
 f = open( "bramble.js" , "w" )

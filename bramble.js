@@ -1,38 +1,24 @@
-// INITALISE BRAMBLE //
 bramble = {};
 bramble.started = false;
-
-// Create game canvas
 bramble.canvas = document.createElement( "canvas" );
 bramble.context = bramble.canvas.getContext( "2d" );
-
 bramble.pixelSize = 1;
 bramble.canvas.width = 800;
 bramble.canvas.height = 600;
-
-// INITALISE GAME OBJECT //
 game = {};
 game.load = function() {};
 game.start = function() {};
-
-// ASSET LOADER //
 assets = {};
 assets.image = {};
 assets.sound = {};
-
 assets.loader = {};
 assets.loader.totalAssetCount = 0;
 assets.loader.loadedAssetCount = 0;
-
 assets.loader.unloadedAssets = [];
-
-// Callback function used by an asset when it loads
 assets.loader.assetLoadCallback = function () {
   assets.loader.loadedAssetCount++;
   if ( assets.loader.loadedAssetCount == assets.loader.totalAssetCount && !bramble.started ) bramble.start();
 }
-
-// Functions used to declare assets
 assets.loader.loadImages = function( assetNames , fileType ) {
   var fileType = fileType || "png";
   assets.loader.totalAssetCount += assetNames.length;
@@ -47,7 +33,6 @@ assets.loader.loadImages = function( assetNames , fileType ) {
     });
   }
 }
-
 assets.loader.loadSounds = function( assetNames , fileType ) {
   var fileType = fileType || "mp3";
   assets.loader.totalAssetCount += assetNames.length;
@@ -62,36 +47,21 @@ assets.loader.loadSounds = function( assetNames , fileType ) {
     });
   }
 }
-
-// Function used to load assets
 assets.loader.loadAssets = function() {
   while ( assets.loader.unloadedAssets.length > 0 ) {
-
-    // Get asset info
     let assetInfo = assets.loader.unloadedAssets.pop();
-
-    // Create the asset's DOM object
     let obj = new assetInfo.objectClass;
     obj.addEventListener( assetInfo.loadEvent , function() {
       assets.loader.loadedAssetCount++;
       assetInfo.container[ assetInfo.name ] = obj;
     });
-
-    // Trigger the asset to load
     obj.src = assetInfo.src;
   }
 }
-
-// GAME STATE SYSTEM //
 game.state = {};
 game.state.stack = [];
-
 Object.defineProperty( game.state , "current" , { get: function () { return game.state.stack[ game.state.stack.length-1 ] } } );
-
-// Function used to cascade an event down the stack
 game.state.triggerEvent = function ( event , ...args ) {
-
-  // Find lowest state from the top of the stack that is allowed to execute on the event
   var n = game.state.stack.length -1;
   var eventCanPass = true;
   while ( n >= 0 && eventCanPass ) {
@@ -100,8 +70,6 @@ game.state.triggerEvent = function ( event , ...args ) {
     n--;
   }
   n++;
-
-  // Execute the event from that state up to the top of the stack
   if ( n >= 0 ) {
     while ( n < game.state.stack.length ) {
       if ( state[event] ) { state[event]( ...args ) }
@@ -109,91 +77,57 @@ game.state.triggerEvent = function ( event , ...args ) {
     }
   }
 }
-
-// Functions used to manipulate the state stack
 game.state.end = function () {
-  // End and remove the state on the top of the stack
   var oldState = game.state.stack.pop();
   if ( oldState ) { oldState.end() }
-
-  // Resume the state now on the top of the stack
   var newState = game.state.current;
   if ( newState ) { newState.resume() }
 }
-
 game.state.start = function ( state ) {
-  // Leave the state on the top of the stack
   var oldState = game.state.current;
   if ( oldState ) { oldState.leave() }
-
-  // Start and push to the stack the given state
   game.state.stack.push( state );
   state.start();
 }
-
 game.state.switch = function ( state ) {
-  // End and remove the state on the top of the stack
   var oldState = game.state.stack.pop();
   if ( oldState ) { oldState.end() }
-
-  // Start and push to the stack the given state
   game.state.stack.push( state );
   state.start();
 }
-
-// MAIN LOOP //
 bramble.lastTimestamp
 bramble.loop = function ( timestamp ) {
   bramble.context.fillStyle = "#000";
   bramble.context.fillRect( 0 , 0 , bramble.canvas.width , bramble.canvas.height );
-
   var dt = ( timestamp - bramble.lastTimestamp )/1000;
   bramble.lastTimestamp = timestamp;
   game.state.triggerEvent( "update" , dt );
   game.state.triggerEvent( "draw" , dt );
-
   window.requestAnimationFrame( bramble.loop );
 }
-
-// BRAMBLE LOAD //
 bramble.load = function() {
-
-  // Load game
   game.load();
-
-  // Append canvas to page
   bramble.canvas.style.width = bramble.canvas.width * bramble.pixelSize + "px";
   bramble.canvas.style.height = bramble.canvas.height * bramble.pixelSize + "px";
   if ( bramble.pixelSize > 1 ) bramble.canvas.style.imageRendering = "crisp-edges";
   document.body.appendChild( bramble.canvas );
-
-  // Load assets
   if ( assets.loader.unloadedAssets.length > 0 ) {
     assets.loader.loadAssets();
     if ( game.state.stack.length == 0 ) game.state.start( new BrambleLoadingState );
   } else {
     bramble.start();
   }
-  
 }
-
-// BRAMBLE START //
 bramble.start = function() {
   bramble.started = true;
   game.start();
   window.requestAnimationFrame( bramble.loop );
 }
-
-// DRAWING LIBRARY //
 bramble.draw = {}
-
-// Set color
 bramble.draw.setColor = function ( color ) {
 	bramble.context.strokeStyle = color;
 	bramble.context.fillStyle   = color;
 }
-
-// Rectangle
 bramble.draw.rectangle = function( x , y , w , h , mode , color ) {
 	bramble.draw.setColor( color )
 	switch ( mode ) {
@@ -202,8 +136,6 @@ bramble.draw.rectangle = function( x , y , w , h , mode , color ) {
 		default: throw new Error( "Mode '" + mode + "' is not a valid draw mode" );
 	}
 }
-
-// Circle
 bramble.draw.circle = function ( x , y , r , mode , color ) {
 	bramble.draw.setColor( color )
 	bramble.context.beginPath();
@@ -215,8 +147,6 @@ bramble.draw.circle = function ( x , y , r , mode , color ) {
 	}
 	bramble.context.closePath();
 }
-
-// Line
 bramble.draw.line = function ( x1 , y1 , x2 , y2 , color ) {
 	bramble.draw.setColor( color )
   bramble.context.beginPath();
@@ -225,36 +155,26 @@ bramble.draw.line = function ( x1 , y1 , x2 , y2 , color ) {
   bramble.context.stroke();
   bramble.context.closePath();
 }
-
-// Vector
 bramble.draw.vec = function ( v , color , x , y ) {
 	x = x || 0;
 	y = y || 0;
 	bramble.draw.line( x , y , x+v.x , y+v.y , color );
 }
-
-// Image
 bramble.draw.image = function ( img , x , y ) {
 	bramble.context.drawImage( img , x , y );
 }
-
-// INPUT HANDLING //
-
-// Keyboard input
 game.keyIsHeld = {};
 game.keyDown = function( key ) {};
 game.keyUp   = function( key ) {};
-
 bramble.canvas.addEventListener( "keydown" , function ( event ) {
   game.keyIsHeld[ event.key ] = true;
-  if ( [32, 37, 38, 39, 40].indexOf( event.keyCode ) > -1 ) event.preventDefault(); // Prevent the default action of the space bar and arrow keys
+  if ( [32, 37, 38, 39, 40].indexOf( event.keyCode ) > -1 ) event.preventDefault(); 
   if ( !event.repeat ) {
     var key = event.key.toLowerCase();
     game.keyDown( key );
     game.state.triggerEvent( "keyDown" , key );
   }
 });
-
 bramble.canvas.addEventListener( "keyup", function ( event ) {
   game.keyIsHeld[ event.key ] = undefined;
 	if ( !event.repeat ) {
@@ -263,135 +183,91 @@ bramble.canvas.addEventListener( "keyup", function ( event ) {
     game.state.triggerEvent( "keyUp" , key );
   }
 });
-
-// Mouse input
 game.mouseDown = function( x , y , button ) {};
 game.mouseUp   = function( x , y , button ) {};
 game.mouseMove = function( x , y ) {};
-
 bramble.canvas.addEventListener( "mousedown" , function ( event ) {
   var x = event.pageX - bramble.canvas.offsetLeft;
   var y = event.pageY - bramble.canvas.offsetTop;
   game.mouseDown( x , y , event.button );
   game.state.triggerEvent( "mouseDown" , x , y , event.button );
 });
-
 bramble.canvas.addEventListener( "mouseup" , function ( event ) {
   var x = event.pageX - bramble.canvas.offsetLeft;
   var y = event.pageY - bramble.canvas.offsetTop;
   game.mouseUp( x , y , event.button );
   game.state.triggerEvent( "mouseUp" , x , y , event.button );
 });
-
 bramble.canvas.addEventListener( "mousemove" , function ( event ) {
   var x = event.pageX - bramble.canvas.offsetLeft;
   var y = event.pageY - bramble.canvas.offsetTop;
   game.mouseMove( x , y );
   game.state.triggerEvent( "mouseMove" , x , y );
-
 });
-
-// 2D VECTOR OBJECT //
 class Vec {
   constructor( x , y ) {
     this.x = x || 0;
     this.y = y || 0;
   }
-
   get m() { return Math.sqrt( Math.pow(this.x,2) + Math.pow(this.y,2) ) }
   get u() { return new Vec( this.x/this.m || 0 , this.y/this.m || 0 ) }
   get n() { return new Vec( this.y , -this.x ) }
-
   add(v) { return new Vec( this.x +v.x , this.y +v.y ) }
   sub(v) { return new Vec( this.x -v.x , this.y -v.y ) }
   mul(c) { return new Vec( this.x *c , this.y *c ) }
   div(c) { return new Vec( this.x /c , this.y /c ) }
   dot(v) { return this.x*v.x + this.y*v.y }
   angleTo(v) { return Math.acos( this.dot(v) / (this.m*v.m) ) }
-
 }
-
-// GAME STATE SYSTEM STATE //
 class GameState {
   constructor() {
     this._eventCanPass = {};
   }
-
   enableEventPass( event )  { this._eventCanPass[event] = true }
   disableEventPass( event ) { delete this._eventCanPass[event] }
   canEventPass( event )     { return this._eventCanPass[event] }
-
   get focused() { return game.state.current == this }
-
   start() {}
   resume() {}
   leave() {}
   end() {}
-
-  // Bramble event callbacks //
-  // update( dt ) {}
-  // draw() {}
-
-  // keyDown( key ) {}
-  // keyUp( key ) {}
-  // mouseDown( x , y , button ) {}
-  // mouseUp( x , y , button ) {}
-  // mouseMove( x , y ) {}
 }
-
-// ENTITY COMPONENT SYSTEM ENTITY //
 class Entity {
   constructor() {
     this.components = [];
     this.indexedComponents = {};
   }
-
-  // Add a given component to the entity
   addComponent( comp ) {
     if ( this.indexedComponents[comp.name] == null ) this.indexedComponents[comp.name] = [];
     this.indexedComponents[comp.name].push( comp );
     this.components.push( comp );
     comp.parent = this;
   }
-
-  // Remove a given component from the entity
   removeComponent( comp ) {
     this.components.splice( this.components.indexOf( comp ) , 1 )
     this.indexedComponents[comp.name].splice( this.indexedComponents[comp.name].indexOf( comp ) , 1 )
   }
-
-  // Generate a component group list for a certian type of component
   forEach( compName ) {
     var compGroups = [];
     for ( var comp of this.getComponents( compName ) ) compGroups.push([comp]);
     return new ComponentGroupList( this , compGroups )
   }
-
-  // Component getters
   getComponents( compName ) { return this.indexedComponents[compName] || []; }
   getComponent( compName ) { return this.getComponents[0]; }
-
 }
-
-// ENTITY COMPONENT SYSTEM COMPONENT //
 class Component {
   constructor( name ) {
     this.name = name
   }
 }
-
-// ENTITY COMPONENT SYSTEM COMPONENT LIST //
 class ComponentGroupList {
   constructor( parent , componentGroups ) {
     this.parent = parent;
     this.componentGroups = componentGroups || [];
   }
-
-  // Generate a new component group list wherein for every component of a certian type is appened to a copy of every existing group
   forEach( compName ) {
     var newGroups = [];
     var newComps = this.parent.getComponents( compName );
-
     for ( var oldGroup of this.componentGroups ) {
       for ( var newComp of newComps ) {
         var group = []
@@ -400,11 +276,8 @@ class ComponentGroupList {
         newGroups.push( group )
       }
     }
-
     return new ComponentGroupList( this.parent , newGroups )
   }
-
-  // Execute a function on each group of components
   run( funct ) {
     console.log( this.parent )
     for ( var group of this.componentGroups ) {
@@ -412,27 +285,16 @@ class ComponentGroupList {
     }
   }
 }
-
-// STANDARD COMPONENTS //
-
-// Position component
-// Used to store the position of an entity as a vector
 class PositionComp extends Component {
   constructor( x , y ) {
     super( "position" );
     this.vec = new Vec( x , y );
   }
-
   get x() { return this.vec.x }
   get y() { return this.vec.y }
   set x(v) { this.vec.x = v }
   set y(v) { this.vec.y = v }
 }
-
-// STANDARD STATES //
-
-// Bramble Loading State
-// Used as the default loading screen when loading the game's assets
 class BrambleLoadingState extends GameState {
   constructor() {
     super();
@@ -442,15 +304,12 @@ class BrambleLoadingState extends GameState {
     this.barH = 4;
     this.progress = 0;
   }
-
   update() {
     this.progress = assets.loader.loadedAssetCount / assets.loader.totalAssetCount;
     if ( progress == 1 && this.focused ) game.state.end();
   }
-
   draw() {
     bramble.draw.rectangle( this.barX , this.barY , this.barW , this.barH , "fill" , "#666" );
     bramble.draw.rectangle( this.barX , this.barY , this.barW * progress , this.barH , "fill" , "#EEE" );
   }
 }
-
