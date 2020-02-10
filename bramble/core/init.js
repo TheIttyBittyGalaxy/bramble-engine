@@ -1,9 +1,10 @@
 // INITALISE BRAMBLE //
 bramble = {};
+bramble.started = false;
 
 // Create game canvas
-bramble.canvas = document.createElement( 'canvas' );
-bramble.context = bramble.canvas.getContext( '2d' );
+bramble.canvas = document.createElement( "canvas" );
+bramble.context = bramble.canvas.getContext( "2d" );
 
 bramble.pixelSize = 1;
 bramble.canvas.width = 800;

@@ -6,6 +6,7 @@ fileNames = [
     "core/assets.js",
     "core/state.js",
     "core/loop.js",
+    "core/load.js",
     "core/start.js",
     "core/draw.js",
     "core/input.js",
@@ -25,6 +26,6 @@ for fileName in fileNames:
     f.close()
 
 # Write content to file
-f = open( "../bramble.js" , "w" )
+f = open( "bramble.js" , "w" )
 f.write( engineContent )
 f.close()
