@@ -74,13 +74,17 @@ class GameState {
   leave() {}
   end() {}
 
+  /*
   // Bramble event callbacks //
-  // keyDown( key ) {}
-  // keyUp( key ) {}
-  // mouseDown( x , y , button ) {}
-  // mouseUp( x , y , button ) {}
-  // mouseMove( x , y ) {}
-  // update( dt ) {}
+  update( dt ) {}
+  draw() {}
+
+  keyDown( key ) {}
+  keyUp( key ) {}
+  mouseDown( x , y , button ) {}
+  mouseUp( x , y , button ) {}
+  mouseMove( x , y ) {}
+  */
 }
 
 // Game state used for the generic loading screen
@@ -91,12 +95,16 @@ class BrambleLoadingState extends GameState {
     this.barW = bramble.canvas.width *.6;
     this.barY = bramble.canvas.height/2 -2;
     this.barH = 4;
+    this.progress = 0;
   }
 
   update() {
-    var progress = assets.loader.loadedAssetCount / assets.loader.totalAssetCount;
-    bramble.draw.rectangle( this.barX , this.barY , this.barW , this.barH , "fill" , "#666" );
-    bramble.draw.rectangle( this.barX , this.barY , this.barW * progress , this.barH , "fill" , "#EEE" );
+    this.progress = assets.loader.loadedAssetCount / assets.loader.totalAssetCount;
     if ( progress == 1 && this.focused ) game.state.end();
+  }
+
+  draw() {
+    bramble.draw.rectangle( this.barX , this.barY , this.barW , this.barH , "fill" , "#666" );
+    bramble.draw.rectangle( this.barX , this.barY , this.barW * progress , this.barH , "fill" , "#EEE" );    
   }
 }

@@ -6,7 +6,8 @@ bramble.loop = function ( timestamp ) {
 
   var dt = ( timestamp - bramble.lastTimestamp )/1000;
   bramble.lastTimestamp = timestamp;
-  game.state.triggerEvent( "update" , dt );
+  game.state.triggerEvent( 'update' , dt );
+  game.state.triggerEvent( 'draw' , dt );
 
   window.requestAnimationFrame( bramble.loop );
 }
