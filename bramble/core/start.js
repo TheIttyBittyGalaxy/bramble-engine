@@ -7,7 +7,7 @@ bramble.start = function() {
   // Append canvas to page
   bramble.canvas.style.width = bramble.canvas.width * bramble.pixelSize + "px";
   bramble.canvas.style.height = bramble.canvas.height * bramble.pixelSize + "px";
-  if ( bramble.pixelSize > 1 ) { bramble.canvas.style.imageRendering = "pixelated" }
+  if ( bramble.pixelSize > 1 ) { bramble.canvas.style.imageRendering = "crisp-edges" }
   document.body.appendChild( bramble.canvas );
 
   // Load assets
