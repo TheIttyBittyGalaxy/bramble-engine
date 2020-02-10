@@ -6,6 +6,7 @@ fileNames = [
     "core/assets.js",
     "core/state.js",
     "core/loop.js",
+    "core/load.js",
     "core/start.js",
     "core/draw.js",
     "core/input.js",

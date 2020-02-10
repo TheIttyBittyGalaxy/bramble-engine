@@ -1,5 +1,6 @@
 // INITALISE BRAMBLE //
 bramble = {};
+bramble.started = false;
 
 // Create game canvas
 bramble.canvas = document.createElement( "canvas" );
@@ -20,7 +21,6 @@ assets.image = {};
 assets.sound = {};
 
 assets.loader = {};
-assets.loader.complete = false;
 assets.loader.totalAssetCount = 0;
 assets.loader.loadedAssetCount = 0;
 
@@ -29,7 +29,7 @@ assets.loader.unloadedAssets = [];
 // Callback function used by an asset when it loads
 assets.loader.assetLoadCallback = function () {
   assets.loader.loadedAssetCount++;
-  if ( assets.loader.loadedAssetCount == assets.loader.totalAssetCount ) assets.loader.complete = true;
+  if ( assets.loader.loadedAssetCount == assets.loader.totalAssetCount && !bramble.started ) bramble.start();
 }
 
 // Functions used to declare assets
@@ -207,8 +207,8 @@ bramble.loop = function ( timestamp ) {
   window.requestAnimationFrame( bramble.loop );
 }
 
-// BRAMBLE START //
-bramble.start = function() {
+// BRAMBLE LOAD //
+bramble.load = function() {
 
   // Load game
   game.load();
@@ -216,18 +216,24 @@ bramble.start = function() {
   // Append canvas to page
   bramble.canvas.style.width = bramble.canvas.width * bramble.pixelSize + "px";
   bramble.canvas.style.height = bramble.canvas.height * bramble.pixelSize + "px";
-  if ( bramble.pixelSize > 1 ) { bramble.canvas.style.imageRendering = "crisp-edges" }
+  if ( bramble.pixelSize > 1 ) bramble.canvas.style.imageRendering = "crisp-edges";
   document.body.appendChild( bramble.canvas );
 
   // Load assets
-	if ( assets.loader.unloadedAssets.length > 0 ) {
-		assets.loader.loadAssets();
-		game.state.start( new BrambleLoadingState );
-	}
+  if ( assets.loader.unloadedAssets.length > 0 ) {
+    assets.loader.loadAssets();
+    if ( game.state.stack.length == 0 ) game.state.start( new BrambleLoadingState );
+  } else {
+    bramble.start();
+  }
+  
+}
 
-  // Start game
+// BRAMBLE START //
+bramble.start = function() {
+  bramble.started = true;
   game.start();
-	window.requestAnimationFrame( bramble.loop );
+  window.requestAnimationFrame( bramble.loop );
 }
 
 // DRAWING LIBRARY //

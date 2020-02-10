@@ -4,7 +4,6 @@ assets.image = {};
 assets.sound = {};
 
 assets.loader = {};
-assets.loader.complete = false;
 assets.loader.totalAssetCount = 0;
 assets.loader.loadedAssetCount = 0;
 
@@ -13,7 +12,7 @@ assets.loader.unloadedAssets = [];
 // Callback function used by an asset when it loads
 assets.loader.assetLoadCallback = function () {
   assets.loader.loadedAssetCount++;
-  if ( assets.loader.loadedAssetCount == assets.loader.totalAssetCount ) assets.loader.complete = true;
+  if ( assets.loader.loadedAssetCount == assets.loader.totalAssetCount && !bramble.started ) bramble.start();
 }
 
 // Functions used to declare assets
