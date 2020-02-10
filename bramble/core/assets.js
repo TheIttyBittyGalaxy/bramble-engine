@@ -13,12 +13,12 @@ assets.loader.unloadedAssets = [];
 // Callback function used by an asset when it loads
 assets.loader.assetLoadCallback = function () {
   assets.loader.loadedAssetCount++;
-  if ( assets.loader.loadedAssetCount == assets.loader.totalAssetCount ) assets.loader.complete = true
+  if ( assets.loader.loadedAssetCount == assets.loader.totalAssetCount ) assets.loader.complete = true;
 }
 
 // Functions used to declare assets
 assets.loader.loadImages = function( assetNames , fileType ) {
-  var fileType = fileType || 'png';
+  var fileType = fileType || "png";
   assets.loader.totalAssetCount += assetNames.length;
   for ( var assetName of assetNames ) {
     assets.loader.unloadedAssets.push({
@@ -60,9 +60,8 @@ assets.loader.loadAssets = function() {
       assets.loader.loadedAssetCount++;
       assetInfo.container[ assetInfo.name ] = obj;
     });
-    // obj.addEventListener( "error" , function() {});
 
     // Trigger the asset to load
-    obj.src = assetInfo.src
+    obj.src = assetInfo.src;
   }
 }

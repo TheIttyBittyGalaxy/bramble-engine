@@ -11,9 +11,9 @@ bramble.draw.setColor = function ( color ) {
 bramble.draw.rectangle = function( x , y , w , h , mode , color ) {
 	bramble.draw.setColor( color )
 	switch ( mode ) {
-		case 'line': bramble.context.strokeRect( x , y , w , h ); break;
-		case 'fill': bramble.context.fillRect( x , y , w , h );   break;
-		default: throw new Error( 'Mode "' + mode + '" is not a valid draw mode' );
+		case "line": bramble.context.strokeRect( x , y , w , h ); break;
+		case "fill": bramble.context.fillRect( x , y , w , h );   break;
+		default: throw new Error( "Mode '" + mode + "' is not a valid draw mode" );
 	}
 }
 
@@ -23,9 +23,9 @@ bramble.draw.circle = function ( x , y , r , mode , color ) {
 	bramble.context.beginPath();
 	bramble.context.arc( x , y , r , 0 , 2*Math.PI );
 	switch ( mode ) {
-		case 'line': bramble.context.stroke(); break;
-		case 'fill': bramble.context.fill();   break;
-		default: throw new Error( 'Mode "' + mode + '" is not a valid draw mode' );
+		case "line": bramble.context.stroke(); break;
+		case "fill": bramble.context.fill();   break;
+		default: throw new Error( "Mode '" + mode + "' is not a valid draw mode" );
 	}
 	bramble.context.closePath();
 }
