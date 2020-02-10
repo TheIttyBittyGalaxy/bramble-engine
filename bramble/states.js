@@ -13,7 +13,7 @@ class BrambleLoadingState extends GameState {
   }
 
   update() {
-    this.progress = assets.loader.loadedAssetCount / assets.loader.totalAssetCount;
+    this.progress = bramble.assetLoader.loadedAssetCount / bramble.assetLoader.totalAssetCount;
     if ( progress == 1 && this.focused ) game.state.end();
   }
 

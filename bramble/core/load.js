@@ -11,8 +11,8 @@ bramble.load = function() {
   document.body.appendChild( bramble.canvas );
 
   // Load assets
-  if ( assets.loader.unloadedAssets.length > 0 ) {
-    assets.loader.loadAssets();
+  if ( bramble.assetLoader.unloadedAssets.length > 0 ) {
+    bramble.assetLoader.loadAssets();
     if ( game.state.stack.length == 0 ) game.state.start( new BrambleLoadingState );
   } else {
     bramble.start();

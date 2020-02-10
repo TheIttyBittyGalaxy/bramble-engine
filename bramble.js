@@ -6,53 +6,61 @@ bramble.pixelSize = 1;
 bramble.canvas.width = 800;
 bramble.canvas.height = 600;
 game = {};
+game.asset = {};
 game.load = function() {};
 game.start = function() {};
-assets = {};
-assets.image = {};
-assets.sound = {};
-assets.loader = {};
-assets.loader.totalAssetCount = 0;
-assets.loader.loadedAssetCount = 0;
-assets.loader.unloadedAssets = [];
-assets.loader.assetLoadCallback = function () {
-  assets.loader.loadedAssetCount++;
-  if ( assets.loader.loadedAssetCount == assets.loader.totalAssetCount && !bramble.started ) bramble.start();
+bramble.assetLoader = {};
+bramble.assetLoader.unloadedAssets = [];
+bramble.assetLoader.totalAssetCount = 0;
+bramble.assetLoader.loadedAssetCount = 0;
+bramble.assetLoader.defaultImageType = "png";
+bramble.assetLoader.defaultSoundType = "mp3";
+bramble.assetLoader.assetLoadCallback = function () {
+  bramble.assetLoader.loadedAssetCount++;
+  if ( bramble.assetLoader.loadedAssetCount == bramble.assetLoader.totalAssetCount && !bramble.started ) bramble.start();
 }
-assets.loader.loadImages = function( assetNames , fileType ) {
-  var fileType = fileType || "png";
-  assets.loader.totalAssetCount += assetNames.length;
+bramble.assetLoader.loadImages = function( assetNames , fileType ) {
+  var fileType = fileType || bramble.assetLoader.defaultImageType;
+  bramble.assetLoader.totalAssetCount += assetNames.length;
   for ( var assetName of assetNames ) {
-    assets.loader.unloadedAssets.push({
+    bramble.assetLoader.unloadedAssets.push({
       "name": assetName,
       "fileType": fileType,
       "objectClass": Image,
-      "src": "assets/images/" + assetName + "." + fileType,
+      "src": "assets/" + assetName + "." + fileType,
       "loadEvent": "load",
-      "container": assets.image,
+      "container": game.asset,
     });
   }
 }
-assets.loader.loadSounds = function( assetNames , fileType ) {
-  var fileType = fileType || "mp3";
-  assets.loader.totalAssetCount += assetNames.length;
+bramble.assetLoader.loadSounds = function( assetNames , fileType ) {
+  var fileType = fileType || bramble.assetLoader.defaultSoundType;
+  bramble.assetLoader.totalAssetCount += assetNames.length;
   for ( var assetName of assetNames ) {
-    assets.loader.unloadedAssets.push({
+    bramble.assetLoader.unloadedAssets.push({
       "name": assetName,
       "fileType": fileType,
       "objectClass": Audio,
-      "src": "assets/sounds/" + assetName + "." + fileType,
+      "src": "assets/" + assetName + "." + fileType,
       "loadEvent": "canplaythrough",
-      "container": assets.sound,
+      "container": game.asset,
     });
   }
 }
-assets.loader.loadAssets = function() {
-  while ( assets.loader.unloadedAssets.length > 0 ) {
-    let assetInfo = assets.loader.unloadedAssets.pop();
+bramble.assetLoader.loadAssets = function() {
+  while ( bramble.assetLoader.unloadedAssets.length > 0 ) {
+    let assetInfo = bramble.assetLoader.unloadedAssets.pop();
+    while ( assetInfo.name.search( /[\\/]/ ) > -1 ) {
+      var slashPos = assetInfo.name.search( /[\\/]/ );
+      var subContainerName = assetInfo.name.charAt(0).toLowerCase() + assetInfo.name.substr( 1 , slashPos-1 );
+      if ( assetInfo.container[ subContainerName ] == null ) assetInfo.container[ subContainerName ] = {};
+      assetInfo.container = assetInfo.container[ subContainerName ];
+      assetInfo.name = assetInfo.name.slice( slashPos+1 );
+    }
+    assetInfo.name = assetInfo.name.charAt(0).toLowerCase() + assetInfo.name.slice( 1 );
     let obj = new assetInfo.objectClass;
     obj.addEventListener( assetInfo.loadEvent , function() {
-      assets.loader.loadedAssetCount++;
+      bramble.assetLoader.loadedAssetCount++;
       assetInfo.container[ assetInfo.name ] = obj;
     });
     obj.src = assetInfo.src;
@@ -111,8 +119,8 @@ bramble.load = function() {
   bramble.canvas.style.height = bramble.canvas.height * bramble.pixelSize + "px";
   if ( bramble.pixelSize > 1 ) bramble.canvas.style.imageRendering = "crisp-edges";
   document.body.appendChild( bramble.canvas );
-  if ( assets.loader.unloadedAssets.length > 0 ) {
-    assets.loader.loadAssets();
+  if ( bramble.assetLoader.unloadedAssets.length > 0 ) {
+    bramble.assetLoader.loadAssets();
     if ( game.state.stack.length == 0 ) game.state.start( new BrambleLoadingState );
   } else {
     bramble.start();
@@ -305,7 +313,7 @@ class BrambleLoadingState extends GameState {
     this.progress = 0;
   }
   update() {
-    this.progress = assets.loader.loadedAssetCount / assets.loader.totalAssetCount;
+    this.progress = bramble.assetLoader.loadedAssetCount / bramble.assetLoader.totalAssetCount;
     if ( progress == 1 && this.focused ) game.state.end();
   }
   draw() {

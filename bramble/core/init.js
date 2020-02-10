@@ -12,5 +12,6 @@ bramble.canvas.height = 600;
 
 // INITALISE GAME OBJECT //
 game = {};
+game.asset = {};
 game.load = function() {};
 game.start = function() {};

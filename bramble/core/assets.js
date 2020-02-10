@@ -1,62 +1,70 @@
 // ASSET LOADER //
-assets = {};
-assets.image = {};
-assets.sound = {};
+bramble.assetLoader = {};
+bramble.assetLoader.unloadedAssets = [];
+bramble.assetLoader.totalAssetCount = 0;
+bramble.assetLoader.loadedAssetCount = 0;
 
-assets.loader = {};
-assets.loader.totalAssetCount = 0;
-assets.loader.loadedAssetCount = 0;
-
-assets.loader.unloadedAssets = [];
+bramble.assetLoader.defaultImageType = "png";
+bramble.assetLoader.defaultSoundType = "mp3";
 
 // Callback function used by an asset when it loads
-assets.loader.assetLoadCallback = function () {
-  assets.loader.loadedAssetCount++;
-  if ( assets.loader.loadedAssetCount == assets.loader.totalAssetCount && !bramble.started ) bramble.start();
+bramble.assetLoader.assetLoadCallback = function () {
+  bramble.assetLoader.loadedAssetCount++;
+  if ( bramble.assetLoader.loadedAssetCount == bramble.assetLoader.totalAssetCount && !bramble.started ) bramble.start();
 }
 
 // Functions used to declare assets
-assets.loader.loadImages = function( assetNames , fileType ) {
-  var fileType = fileType || "png";
-  assets.loader.totalAssetCount += assetNames.length;
+bramble.assetLoader.loadImages = function( assetNames , fileType ) {
+  var fileType = fileType || bramble.assetLoader.defaultImageType;
+  bramble.assetLoader.totalAssetCount += assetNames.length;
   for ( var assetName of assetNames ) {
-    assets.loader.unloadedAssets.push({
+    bramble.assetLoader.unloadedAssets.push({
       "name": assetName,
       "fileType": fileType,
       "objectClass": Image,
-      "src": "assets/images/" + assetName + "." + fileType,
+      "src": "assets/" + assetName + "." + fileType,
       "loadEvent": "load",
-      "container": assets.image,
+      "container": game.asset,
     });
   }
 }
 
-assets.loader.loadSounds = function( assetNames , fileType ) {
-  var fileType = fileType || "mp3";
-  assets.loader.totalAssetCount += assetNames.length;
+bramble.assetLoader.loadSounds = function( assetNames , fileType ) {
+  var fileType = fileType || bramble.assetLoader.defaultSoundType;
+  bramble.assetLoader.totalAssetCount += assetNames.length;
   for ( var assetName of assetNames ) {
-    assets.loader.unloadedAssets.push({
+    bramble.assetLoader.unloadedAssets.push({
       "name": assetName,
       "fileType": fileType,
       "objectClass": Audio,
-      "src": "assets/sounds/" + assetName + "." + fileType,
+      "src": "assets/" + assetName + "." + fileType,
       "loadEvent": "canplaythrough",
-      "container": assets.sound,
+      "container": game.asset,
     });
   }
 }
 
 // Function used to load assets
-assets.loader.loadAssets = function() {
-  while ( assets.loader.unloadedAssets.length > 0 ) {
+bramble.assetLoader.loadAssets = function() {
+  while ( bramble.assetLoader.unloadedAssets.length > 0 ) {
 
     // Get asset info
-    let assetInfo = assets.loader.unloadedAssets.pop();
+    let assetInfo = bramble.assetLoader.unloadedAssets.pop();
+
+    // Reassign name and container
+    while ( assetInfo.name.search( /[\\/]/ ) > -1 ) {
+      var slashPos = assetInfo.name.search( /[\\/]/ );
+      var subContainerName = assetInfo.name.charAt(0).toLowerCase() + assetInfo.name.substr( 1 , slashPos-1 );
+      if ( assetInfo.container[ subContainerName ] == null ) assetInfo.container[ subContainerName ] = {};
+      assetInfo.container = assetInfo.container[ subContainerName ];
+      assetInfo.name = assetInfo.name.slice( slashPos+1 );
+    }
+    assetInfo.name = assetInfo.name.charAt(0).toLowerCase() + assetInfo.name.slice( 1 );
 
     // Create the asset's DOM object
     let obj = new assetInfo.objectClass;
     obj.addEventListener( assetInfo.loadEvent , function() {
-      assets.loader.loadedAssetCount++;
+      bramble.assetLoader.loadedAssetCount++;
       assetInfo.container[ assetInfo.name ] = obj;
     });
 
