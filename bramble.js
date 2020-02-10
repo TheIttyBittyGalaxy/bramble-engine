@@ -2,8 +2,8 @@
 bramble = {};
 
 // Create game canvas
-bramble.canvas = document.createElement( 'canvas' );
-bramble.context = bramble.canvas.getContext( '2d' );
+bramble.canvas = document.createElement( "canvas" );
+bramble.context = bramble.canvas.getContext( "2d" );
 
 bramble.pixelSize = 1;
 bramble.canvas.width = 800;
@@ -29,12 +29,12 @@ assets.loader.unloadedAssets = [];
 // Callback function used by an asset when it loads
 assets.loader.assetLoadCallback = function () {
   assets.loader.loadedAssetCount++;
-  if ( assets.loader.loadedAssetCount == assets.loader.totalAssetCount ) assets.loader.complete = true
+  if ( assets.loader.loadedAssetCount == assets.loader.totalAssetCount ) assets.loader.complete = true;
 }
 
 // Functions used to declare assets
 assets.loader.loadImages = function( assetNames , fileType ) {
-  var fileType = fileType || 'png';
+  var fileType = fileType || "png";
   assets.loader.totalAssetCount += assetNames.length;
   for ( var assetName of assetNames ) {
     assets.loader.unloadedAssets.push({
@@ -42,13 +42,14 @@ assets.loader.loadImages = function( assetNames , fileType ) {
       "fileType": fileType,
       "objectClass": Image,
       "src": "assets/images/" + assetName + "." + fileType,
+      "loadEvent": "load",
       "container": assets.image,
     });
   }
 }
 
 assets.loader.loadSounds = function( assetNames , fileType ) {
-  var fileType = fileType || 'mp3';
+  var fileType = fileType || "mp3";
   assets.loader.totalAssetCount += assetNames.length;
   for ( var assetName of assetNames ) {
     assets.loader.unloadedAssets.push({
@@ -56,7 +57,8 @@ assets.loader.loadSounds = function( assetNames , fileType ) {
       "fileType": fileType,
       "objectClass": Audio,
       "src": "assets/sounds/" + assetName + "." + fileType,
-      "container": assets.image,
+      "loadEvent": "canplaythrough",
+      "container": assets.sound,
     });
   }
 }
@@ -70,14 +72,13 @@ assets.loader.loadAssets = function() {
 
     // Create the asset's DOM object
     let obj = new assetInfo.objectClass;
-    obj.addEventListener( "load" , function() {
+    obj.addEventListener( assetInfo.loadEvent , function() {
       assets.loader.loadedAssetCount++;
       assetInfo.container[ assetInfo.name ] = obj;
     });
-    // obj.addEventListener( "error" , function() {});
 
     // Trigger the asset to load
-    obj.src = assetInfo.src
+    obj.src = assetInfo.src;
   }
 }
 
@@ -157,13 +158,17 @@ class GameState {
   leave() {}
   end() {}
 
+  /*
   // Bramble event callbacks //
-  // keyDown( key ) {}
-  // keyUp( key ) {}
-  // mouseDown( x , y , button ) {}
-  // mouseUp( x , y , button ) {}
-  // mouseMove( x , y ) {}
-  // update( dt ) {}
+  update( dt ) {}
+  draw() {}
+
+  keyDown( key ) {}
+  keyUp( key ) {}
+  mouseDown( x , y , button ) {}
+  mouseUp( x , y , button ) {}
+  mouseMove( x , y ) {}
+  */
 }
 
 // Game state used for the generic loading screen
@@ -174,25 +179,30 @@ class BrambleLoadingState extends GameState {
     this.barW = bramble.canvas.width *.6;
     this.barY = bramble.canvas.height/2 -2;
     this.barH = 4;
+    this.progress = 0;
   }
 
   update() {
-    var progress = assets.loader.loadedAssetCount / assets.loader.totalAssetCount;
-    bramble.draw.rectangle( this.barX , this.barY , this.barW , this.barH , "fill" , "#666" );
-    bramble.draw.rectangle( this.barX , this.barY , this.barW * progress , this.barH , "fill" , "#EEE" );
+    this.progress = assets.loader.loadedAssetCount / assets.loader.totalAssetCount;
     if ( progress == 1 && this.focused ) game.state.end();
+  }
+
+  draw() {
+    bramble.draw.rectangle( this.barX , this.barY , this.barW , this.barH , "fill" , "#666" );
+    bramble.draw.rectangle( this.barX , this.barY , this.barW * progress , this.barH , "fill" , "#EEE" );    
   }
 }
 
 // MAIN LOOP //
 bramble.lastTimestamp
 bramble.loop = function ( timestamp ) {
-  bramble.context.fillStyle = '#000';
+  bramble.context.fillStyle = "#000";
   bramble.context.fillRect( 0 , 0 , bramble.canvas.width , bramble.canvas.height );
 
   var dt = ( timestamp - bramble.lastTimestamp )/1000;
   bramble.lastTimestamp = timestamp;
   game.state.triggerEvent( "update" , dt );
+  game.state.triggerEvent( "draw" , dt );
 
   window.requestAnimationFrame( bramble.loop );
 }
@@ -206,7 +216,7 @@ bramble.start = function() {
   // Append canvas to page
   bramble.canvas.style.width = bramble.canvas.width * bramble.pixelSize + "px";
   bramble.canvas.style.height = bramble.canvas.height * bramble.pixelSize + "px";
-  if ( bramble.pixelSize > 1 ) { bramble.canvas.style.imageRendering = "pixelated" }
+  if ( bramble.pixelSize > 1 ) { bramble.canvas.style.imageRendering = "crisp-edges" }
   document.body.appendChild( bramble.canvas );
 
   // Load assets
@@ -233,9 +243,9 @@ bramble.draw.setColor = function ( color ) {
 bramble.draw.rectangle = function( x , y , w , h , mode , color ) {
 	bramble.draw.setColor( color )
 	switch ( mode ) {
-		case 'line': bramble.context.strokeRect( x , y , w , h ); break;
-		case 'fill': bramble.context.fillRect( x , y , w , h );   break;
-		default: throw new Error( 'Mode "' + mode + '" is not a valid draw mode' );
+		case "line": bramble.context.strokeRect( x , y , w , h ); break;
+		case "fill": bramble.context.fillRect( x , y , w , h );   break;
+		default: throw new Error( "Mode '" + mode + "' is not a valid draw mode" );
 	}
 }
 
@@ -245,9 +255,9 @@ bramble.draw.circle = function ( x , y , r , mode , color ) {
 	bramble.context.beginPath();
 	bramble.context.arc( x , y , r , 0 , 2*Math.PI );
 	switch ( mode ) {
-		case 'line': bramble.context.stroke(); break;
-		case 'fill': bramble.context.fill();   break;
-		default: throw new Error( 'Mode "' + mode + '" is not a valid draw mode' );
+		case "line": bramble.context.stroke(); break;
+		case "fill": bramble.context.fill();   break;
+		default: throw new Error( "Mode '" + mode + "' is not a valid draw mode" );
 	}
 	bramble.context.closePath();
 }
@@ -327,23 +337,63 @@ bramble.canvas.addEventListener( "mousemove" , function ( event ) {
 
 });
 
-// ENTITY COMPONENT SYSTEM //
+// 2D VECTOR OBJECT //
+class Vector {
+  constructor( x , y ) {
+    this.x = x || 0;
+    this.y = y || 0;
+  }
+
+  get m() { return Math.sqrt( Math.pow(this.x,2) + Math.pow(this.y,2) ) }
+  get u() { return new Vector( this.x/this.m || 0 , this.y/this.m || 0 ) }
+  get n() { return new Vector( this.y , -this.x ) }
+
+  add(v) { return new Vector( this.x +v.x , this.y +v.y ) }
+  sub(v) { return new Vector( this.x -v.x , this.y -v.y ) }
+  mul(c) { return new Vector( this.x *c , this.y *c ) }
+  div(c) { return new Vector( this.x /c , this.y /c ) }
+  dot(v) { return this.x*v.x + this.y*v.y }
+
+  angleTo(v) { return Math.acos( this.dot(v) / (this.m*v.m) ) }
+}
+
+// ENTITY COMPONENT SYSTEM ENTITY //
 class Entity {
-  constructor() {}
+  /*:: entityComponentSystem
+  An entity represents a game object with a collection of instansiated components. Components can be added and removed at run time. Entities may contain multiple instances of the same component type if that component permits it.
+  Unlike traditional game objects, entities should not contain game logic. Instead they should only contain data, which should be processed in a game system.
+  implementation: partial*/
+
+  constructor() {
+    /*:: entityComponentSystem/Entity
+    Creates a new entity
+    implementation: none*/
+
+  }
 
   addComponent( comp ) {
+    /*:: entityComponentSystem/Entity
+    Adds the given component to the entiy
+    argument: comp entityComponentSystem/Component The component that will be added to the entity
+    implementation: partial*/
     this[comp.name] = comp;
     comp.parent = this;
   }
 
-  removeComponent( compName ) { delete this[compName] }
+  removeComponent( compName ) {
+    /*:: entityComponentSystem/Entity
+    Removes the specified component from the entity
+    argument: comp entityComponentSystem/Component The component that will be removed from the entity
+    implementation: partial*/
+    delete this[compName]
+  }
 }
 
+// ENTITY COMPONENT SYSTEM COMPONENT //
 class Component {
   constructor( name ) { this.name = name }
 }
 
-// Standard components
 class PositionComp extends Component {
   constructor( x , y ) {
     super( "pos" );
@@ -354,25 +404,5 @@ class PositionComp extends Component {
   get y() { return this.vec.y }
   set x(v) { this.vec.x = v }
   set y(v) { this.vec.y = v }
-}
-
-// 2D VECTOR OBJECT //
-class Vec {
-  constructor( x , y ) {
-    this.x = x || 0;
-    this.y = y || 0;
-  }
-
-  get m() { return Math.sqrt( Math.pow(this.x,2) + Math.pow(this.y,2) ) }
-  get u() { return new Vec( this.x/this.m || 0 , this.y/this.m || 0 ) }
-  get n() { return new Vec( this.y , -this.x ) }
-
-  add(v) { return new Vec( this.x +v.x , this.y +v.y ) }
-  sub(v) { return new Vec( this.x -v.x , this.y -v.y ) }
-  mul(c) { return new Vec( this.x *c , this.y *c ) }
-  div(c) { return new Vec( this.x /c , this.y /c ) }
-  dot(v) { return this.x*v.x + this.y*v.y }
-
-  angleTo(v) { return Math.acos( this.dot(v) / (this.m*v.m) ) }
 }
 
