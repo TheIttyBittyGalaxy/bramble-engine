@@ -4,7 +4,7 @@
 // Used to store the position of an entity as a vector
 class PositionComp extends Component {
   constructor( x , y ) {
-    super( "pos" );
+    super( "position" );
     this.vec = new Vec( x , y );
   }
 

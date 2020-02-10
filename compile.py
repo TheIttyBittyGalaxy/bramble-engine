@@ -15,6 +15,7 @@ fileNames = [
     "object/state.js",
     "object/entity.js",
     "object/component.js",
+    "object/ComponentGroupList.js",
 
     "components.js",
     "states.js",

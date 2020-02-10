@@ -227,7 +227,7 @@ bramble.draw.line = function ( x1 , y1 , x2 , y2 , color ) {
 }
 
 // Vector
-bramble.draw.vector = function ( v , color , x , y ) {
+bramble.draw.vec = function ( v , color , x , y ) {
 	x = x || 0;
 	y = y || 0;
 	bramble.draw.line( x , y , x+v.x , y+v.y , color );
@@ -292,20 +292,20 @@ bramble.canvas.addEventListener( "mousemove" , function ( event ) {
 });
 
 // 2D VECTOR OBJECT //
-class Vector {
+class Vec {
   constructor( x , y ) {
     this.x = x || 0;
     this.y = y || 0;
   }
 
   get m() { return Math.sqrt( Math.pow(this.x,2) + Math.pow(this.y,2) ) }
-  get u() { return new Vector( this.x/this.m || 0 , this.y/this.m || 0 ) }
-  get n() { return new Vector( this.y , -this.x ) }
+  get u() { return new Vec( this.x/this.m || 0 , this.y/this.m || 0 ) }
+  get n() { return new Vec( this.y , -this.x ) }
 
-  add(v) { return new Vector( this.x +v.x , this.y +v.y ) }
-  sub(v) { return new Vector( this.x -v.x , this.y -v.y ) }
-  mul(c) { return new Vector( this.x *c , this.y *c ) }
-  div(c) { return new Vector( this.x /c , this.y /c ) }
+  add(v) { return new Vec( this.x +v.x , this.y +v.y ) }
+  sub(v) { return new Vec( this.x -v.x , this.y -v.y ) }
+  mul(c) { return new Vec( this.x *c , this.y *c ) }
+  div(c) { return new Vec( this.x /c , this.y /c ) }
   dot(v) { return this.x*v.x + this.y*v.y }
   angleTo(v) { return Math.acos( this.dot(v) / (this.m*v.m) ) }
 
@@ -341,16 +341,36 @@ class GameState {
 
 // ENTITY COMPONENT SYSTEM ENTITY //
 class Entity {
-  constructor() {}
+  constructor() {
+    this.components = [];
+    this.indexedComponents = {};
+  }
 
+  // Add a given component to the entity
   addComponent( comp ) {
-    this[comp.name] = comp;
+    if ( this.indexedComponents[comp.name] == null ) this.indexedComponents[comp.name] = [];
+    this.indexedComponents[comp.name].push( comp );
+    this.components.push( comp );
     comp.parent = this;
   }
 
-  removeComponent( compName ) {
-    delete this[compName]
+  // Remove a given component from the entity
+  removeComponent( comp ) {
+    this.components.splice( this.components.indexOf( comp ) , 1 )
+    this.indexedComponents[comp.name].splice( this.indexedComponents[comp.name].indexOf( comp ) , 1 )
   }
+
+  // Generate a component group list for a certian type of component
+  forEach( compName ) {
+    var compGroups = [];
+    for ( var comp of this.getComponents( compName ) ) compGroups.push([comp]);
+    return new ComponentGroupList( this , compGroups )
+  }
+
+  // Component getters
+  getComponents( compName ) { return this.indexedComponents[compName] || []; }
+  getComponent( compName ) { return this.getComponents[0]; }
+
 }
 
 // ENTITY COMPONENT SYSTEM COMPONENT //
@@ -360,13 +380,46 @@ class Component {
   }
 }
 
+// ENTITY COMPONENT SYSTEM COMPONENT LIST //
+class ComponentGroupList {
+  constructor( parent , componentGroups ) {
+    this.parent = parent;
+    this.componentGroups = componentGroups || [];
+  }
+
+  // Generate a new component group list wherein for every component of a certian type is appened to a copy of every existing group
+  forEach( compName ) {
+    var newGroups = [];
+    var newComps = this.parent.getComponents( compName );
+
+    for ( var oldGroup of this.componentGroups ) {
+      for ( var newComp of newComps ) {
+        var group = []
+        for ( var oldComp of oldGroup ) group.push( oldComp )
+        group.push( newComp )
+        newGroups.push( group )
+      }
+    }
+
+    return new ComponentGroupList( this.parent , newGroups )
+  }
+
+  // Execute a function on each group of components
+  run( funct ) {
+    console.log( this.parent )
+    for ( var group of this.componentGroups ) {
+      funct.bind(this.parent)( ...group )
+    }
+  }
+}
+
 // STANDARD COMPONENTS //
 
 // Position component
 // Used to store the position of an entity as a vector
 class PositionComp extends Component {
   constructor( x , y ) {
-    super( "pos" );
+    super( "position" );
     this.vec = new Vec( x , y );
   }
 
