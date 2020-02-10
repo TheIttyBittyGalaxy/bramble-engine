@@ -26,13 +26,14 @@ assets.loader.loadImages = function( assetNames , fileType ) {
       "fileType": fileType,
       "objectClass": Image,
       "src": "assets/images/" + assetName + "." + fileType,
+      "loadEvent": "load",
       "container": assets.image,
     });
   }
 }
 
 assets.loader.loadSounds = function( assetNames , fileType ) {
-  var fileType = fileType || 'mp3';
+  var fileType = fileType || "mp3";
   assets.loader.totalAssetCount += assetNames.length;
   for ( var assetName of assetNames ) {
     assets.loader.unloadedAssets.push({
@@ -40,7 +41,8 @@ assets.loader.loadSounds = function( assetNames , fileType ) {
       "fileType": fileType,
       "objectClass": Audio,
       "src": "assets/sounds/" + assetName + "." + fileType,
-      "container": assets.image,
+      "loadEvent": "canplaythrough",
+      "container": assets.sound,
     });
   }
 }
@@ -54,7 +56,7 @@ assets.loader.loadAssets = function() {
 
     // Create the asset's DOM object
     let obj = new assetInfo.objectClass;
-    obj.addEventListener( "load" , function() {
+    obj.addEventListener( assetInfo.loadEvent , function() {
       assets.loader.loadedAssetCount++;
       assetInfo.container[ assetInfo.name ] = obj;
     });
