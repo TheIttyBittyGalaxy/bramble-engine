@@ -25,6 +25,6 @@ for fileName in fileNames:
     f.close()
 
 # Write content to file
-f = open( "../bramble.js" , "w" )
+f = open( "bramble.js" , "w" )
 f.write( engineContent )
 f.close()
