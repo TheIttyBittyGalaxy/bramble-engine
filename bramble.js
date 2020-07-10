@@ -171,25 +171,24 @@ bramble.draw.vec = function ( v , color , x , y ) {
 bramble.draw.image = function ( img , x , y ) {
 	bramble.context.drawImage( img , x , y );
 }
-game.keyIsHeld = {};
+game.isKeyHeld = {};
 game.keyDown = function( key ) {};
 game.keyUp   = function( key ) {};
 bramble.canvas.addEventListener( "keydown" , function ( event ) {
-  game.keyIsHeld[ event.key ] = true;
-  if ( [32, 37, 38, 39, 40].indexOf( event.keyCode ) > -1 ) event.preventDefault(); 
-  if ( !event.repeat ) {
-    var key = event.key.toLowerCase();
-    game.keyDown( key );
-    game.state.triggerEvent( "keyDown" , key );
-  }
+  event.preventDefault();
+  if ( event.repeat ) break;
+  game.isKeyHeld[ event.key ] = true;
+  var key = event.key.toLowerCase();
+  game.keyDown( key );
+  game.state.triggerEvent( "keyDown" , key );
 });
 bramble.canvas.addEventListener( "keyup", function ( event ) {
-  game.keyIsHeld[ event.key ] = undefined;
-	if ( !event.repeat ) {
-    var key = event.key.toLowerCase();
-    game.keyUp( key );
-    game.state.triggerEvent( "keyUp" , key );
-  }
+  event.preventDefault();
+  if ( event.repeat ) break;
+  delete game.isKeyHeld[ event.key ];
+  var key = event.key.toLowerCase();
+  game.keyUp( key );
+  game.state.triggerEvent( "keyUp" , key );
 });
 game.mouseDown = function( x , y , button ) {};
 game.mouseUp   = function( x , y , button ) {};

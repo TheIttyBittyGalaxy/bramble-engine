@@ -1,27 +1,28 @@
 // INPUT HANDLING //
 
 // Keyboard input
-game.keyIsHeld = {};
+game.isKeyHeld = {};
 game.keyDown = function( key ) {};
 game.keyUp   = function( key ) {};
 
 bramble.canvas.addEventListener( "keydown" , function ( event ) {
-  game.keyIsHeld[ event.key ] = true;
-  if ( [32, 37, 38, 39, 40].indexOf( event.keyCode ) > -1 ) event.preventDefault(); // Prevent the default action of the space bar and arrow keys
-  if ( !event.repeat ) {
-    var key = event.key.toLowerCase();
-    game.keyDown( key );
-    game.state.triggerEvent( "keyDown" , key );
-  }
+  event.preventDefault();
+  if ( event.repeat ) break;
+
+  game.isKeyHeld[ event.key ] = true;
+  var key = event.key.toLowerCase();
+  game.keyDown( key );
+  game.state.triggerEvent( "keyDown" , key );
 });
 
 bramble.canvas.addEventListener( "keyup", function ( event ) {
-  game.keyIsHeld[ event.key ] = undefined;
-	if ( !event.repeat ) {
-    var key = event.key.toLowerCase();
-    game.keyUp( key );
-    game.state.triggerEvent( "keyUp" , key );
-  }
+  event.preventDefault();
+  if ( event.repeat ) break;
+
+  delete game.isKeyHeld[ event.key ];
+  var key = event.key.toLowerCase();
+  game.keyUp( key );
+  game.state.triggerEvent( "keyUp" , key );
 });
 
 // Mouse input
@@ -48,5 +49,4 @@ bramble.canvas.addEventListener( "mousemove" , function ( event ) {
   var y = event.pageY - bramble.canvas.offsetTop;
   game.mouseMove( x , y );
   game.state.triggerEvent( "mouseMove" , x , y );
-
 });
