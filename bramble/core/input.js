@@ -7,7 +7,7 @@ game.keyUp   = function( key ) {};
 
 bramble.canvas.addEventListener( "keydown" , function ( event ) {
   event.preventDefault();
-  if ( event.repeat ) break;
+  if ( event.repeat ) return;
 
   game.isKeyHeld[ event.key ] = true;
   var key = event.key.toLowerCase();
@@ -17,7 +17,7 @@ bramble.canvas.addEventListener( "keydown" , function ( event ) {
 
 bramble.canvas.addEventListener( "keyup", function ( event ) {
   event.preventDefault();
-  if ( event.repeat ) break;
+  if ( event.repeat ) return;
 
   delete game.isKeyHeld[ event.key ];
   var key = event.key.toLowerCase();
