@@ -3,13 +3,17 @@ import re
 
 # Which files should be imported and and in which order
 fileNames = [
+    "utility.js",
+
     "object/event.js",
     "object/entity.js",
     "object/component.js",
+    "object/componentSignature.js",
     # "object/system.js",
     "object/vector.js",
 
     "core/init.js",
+    "core/ecsComponentManager.js",
     "core/assets.js",
     "core/loop.js",
     "core/load.js",

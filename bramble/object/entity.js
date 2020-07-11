@@ -15,16 +15,15 @@ class Entity {
     Entity.freeIDs.push(this.id);
   }
 
-  addComponent(comp, ...compArgs) {
-    if (!Component.isPrototypeOf(comp)) throw 'Argument to add component must be a Component class'
-    if (!bramble._components[comp.name]) bramble._components[comp.name] = [];
-    let c = new comp(...compArgs);
-    bramble._components[comp.name][this.id] = c;
-    return c
+  addComponent(compClass, ...compArgs) {
+    if (!Component.isPrototypeOf(compClass)) throw 'Argument to add component must be a Component class'
+    let comp = new compClass(...compArgs);
+    bramble.componentManager.addComponent(comp, this.id);
+    return comp;
   }
 
   removeComponent(comp) {
-    if (bramble._components[comp.name]) delete bramble._components[comp.name][this.id];
+    bramble.componentManager.removeComponent(comp, this.id);
   }
 
 }

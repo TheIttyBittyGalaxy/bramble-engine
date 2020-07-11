@@ -1,7 +1,6 @@
 // INITALISE BRAMBLE //
 bramble = {};
 bramble.started = false;
-bramble._components = {}
 
 // Create game canvas
 bramble.canvas = document.createElement("canvas");

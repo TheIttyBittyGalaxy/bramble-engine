@@ -1,3 +1,15 @@
+function ensureValue(obj, index, value) {
+  if (!obj[index]) obj[index] = value;
+  return obj[index];
+}
+function removeValue(obj, value) {
+  let i = obj.indexOf(value);
+  if (i > -1) {
+    obj.splice(i, 1);
+    return true;
+  }
+  return false
+}
 class Event {
   constructor() {
     this.functs = [];
@@ -30,22 +42,47 @@ class Entity {
   destroy() {
     Entity.freeIDs.push(this.id);
   }
-  addComponent(comp, ...compArgs) {
-    if (!Component.isPrototypeOf(comp)) throw 'Argument to add component must be a Component class'
-    if (!bramble._components[comp.name]) bramble._components[comp.name] = [];
-    let c = new comp(...compArgs);
-    bramble._components[comp.name][this.id] = c;
-    return c
+  addComponent(compClass, ...compArgs) {
+    if (!Component.isPrototypeOf(compClass)) throw 'Argument to add component must be a Component class'
+    let comp = new compClass(...compArgs);
+    bramble.componentManager.addComponent(comp, this.id);
+    return comp;
   }
   removeComponent(comp) {
-    if (bramble._components[comp.name]) delete bramble._components[comp.name][this.id];
+    bramble.componentManager.removeComponent(comp, this.id);
   }
 }
 Entity.freeIDs = [0];
 class Component {
-  constructor() {
+  static isComponentClass(x) {
+    return typeof x == "Function" && Component.isPrototypeOf(x);
   }
-  get entity() {
+  get brambleID() {
+    if (!_brambleID) bramble.componentManager.registerComponent(this.__proto__);
+    return _brambleID;
+  }
+}
+class ComponentSignature {
+  constructor(...compClasses) {
+    if (compClasses.length == 0) throw 'Component signature must be constructed with one or more components. No arguments were given';
+    this.comps = [];
+    for (let compClass of compClasses) {
+      if (typeof compClass != 'function' || !Component.isPrototypeOf(compClass)) {
+        throw 'Component signature must be constructed with one or more compoents. Value "' + compClass + '" is not a Compoent.';
+      }
+      this.comps.push(compClass._brambleID);
+    }
+    this.comps.sort();
+  }
+  is(other) {
+    if (other.length != this.length) return false
+    for (var i = 0; i < this.length; i++) {
+      if (this.comps[i] != other.comps[i]) return false
+    }
+    return true
+  }
+  get length() {
+    return this.comps.length;
   }
 }
 class Vec {
@@ -65,7 +102,6 @@ class Vec {
 }
 bramble = {};
 bramble.started = false;
-bramble._components = {}
 bramble.canvas = document.createElement("canvas");
 bramble.context = bramble.canvas.getContext("2d");
 bramble.pixelSize = 1;
@@ -76,6 +112,24 @@ game.asset = {};
 game.load = function() { };
 game.start = function() { };
 game.loop = function() { };
+bramble.componentManager = {};
+bramble.componentManager.components = []
+bramble.componentManager.nextID = 0;
+bramble.componentManager.registerComponent = function(compClass) {
+  if (!Component.isComponentClass(compClass)) throw 'Component classes must extend the "Component" class';
+  compClass._brambleID = this.nextID;
+  this.nextID++;
+}
+bramble.componentManager.addComponent = function(comp, ent) {
+  let c = ensureValue(this.components, comp._brambleID, []);
+  ensureValue(c, ent, []).push(comp);
+}
+bramble.componentManager.removeComponent = function(comp, ent) {
+  removeValue(this.components[comp._brambleID][ent], comp)
+}
+bramble.componentManager.getComponents = function(compClass, ent) {
+  return this.components[compClass._brambleID][ent]
+}
 bramble.assetLoader = {};
 bramble.assetLoader.unloadedAssets = [];
 bramble.assetLoader.totalAssetCount = 0;
