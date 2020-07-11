@@ -2,5 +2,5 @@
 bramble.start = function() {
   bramble.started = true;
   game.start();
-  window.requestAnimationFrame( bramble.loop );
+  window.requestAnimationFrame(bramble.loop);
 }

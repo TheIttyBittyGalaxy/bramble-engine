@@ -1,7 +1,7 @@
 // ENTITY COMPONENT SYSTEM ENTITY //
 class Entity {
-  constructor() {}
+  constructor() { }
 
-  addComponent() {}
-  removeComponent() {}
+  addComponent() { }
+  removeComponent() { }
 }

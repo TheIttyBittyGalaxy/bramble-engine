@@ -5,20 +5,20 @@ game.isKeyHeld = {};
 bramble.onKeyDown = new Event();
 bramble.onKeyUp = new Event();
 
-bramble.canvas.addEventListener( "keydown" , function ( event ) {
+bramble.canvas.addEventListener("keydown", function(event) {
   event.preventDefault();
-  if ( event.repeat ) return;
+  if (event.repeat) return;
 
-  game.isKeyHeld[ event.key ] = true;
-  bramble.onKeyDown.invoke( event.key.toLowerCase() );
+  game.isKeyHeld[event.key] = true;
+  bramble.onKeyDown.invoke(event.key.toLowerCase());
 });
 
-bramble.canvas.addEventListener( "keyup", function ( event ) {
+bramble.canvas.addEventListener("keyup", function(event) {
   event.preventDefault();
-  if ( event.repeat ) return;
+  if (event.repeat) return;
 
-  delete game.isKeyHeld[ event.key ];
-  bramble.onKeyUp.invoke( event.key.toLowerCase() );
+  delete game.isKeyHeld[event.key];
+  bramble.onKeyUp.invoke(event.key.toLowerCase());
 });
 
 // Mouse input
@@ -30,17 +30,17 @@ bramble._eventPointToCanvas = function(event) {
   return event.pageX - bramble.canvas.offsetLeft, event.pageY - bramble.canvas.offsetTop;
 }
 
-bramble.canvas.addEventListener( "mousemove" , function ( event ) {
+bramble.canvas.addEventListener("mousemove", function(event) {
   event.preventDefault();
-  bramble.onMouseMove.invoke( ...bramble._eventPointToCanvas( event ) );
+  bramble.onMouseMove.invoke(...bramble._eventPointToCanvas(event));
 });
 
-bramble.canvas.addEventListener( "mousedown" , function ( event ) {
+bramble.canvas.addEventListener("mousedown", function(event) {
   event.preventDefault();
-  bramble.onMouseDown.invoke( ...bramble._eventPointToCanvas( event ) , event.button );
+  bramble.onMouseDown.invoke(...bramble._eventPointToCanvas(event), event.button);
 });
 
-bramble.canvas.addEventListener( "mouseup" , function ( event ) {
+bramble.canvas.addEventListener("mouseup", function(event) {
   event.preventDefault();
-  bramble.onMouseUp.invoke( ...bramble._eventPointToCanvas( event ) , event.button );
+  bramble.onMouseUp.invoke(...bramble._eventPointToCanvas(event), event.button);
 });

@@ -3,9 +3,9 @@
 // Position component
 // Used to store the position of an entity as a vector
 class CPosition extends Component {
-  constructor( x , y ) {
+  constructor(x, y) {
     super();
-    this.vec = new Vec( x , y );
+    this.vec = new Vec(x, y);
   }
 
   get x() { return this.vec.x }
