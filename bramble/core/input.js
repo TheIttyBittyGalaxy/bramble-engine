@@ -2,17 +2,15 @@
 
 // Keyboard input
 game.isKeyHeld = {};
-game.keyDown = function( key ) {};
-game.keyUp   = function( key ) {};
+bramble.onKeyDown = new Event();
+bramble.onKeyUp = new Event();
 
 bramble.canvas.addEventListener( "keydown" , function ( event ) {
   event.preventDefault();
   if ( event.repeat ) return;
 
   game.isKeyHeld[ event.key ] = true;
-  var key = event.key.toLowerCase();
-  game.keyDown( key );
-  game.state.triggerEvent( "keyDown" , key );
+  bramble.onKeyDown.invoke( event.key.toLowerCase() );
 });
 
 bramble.canvas.addEventListener( "keyup", function ( event ) {
@@ -20,33 +18,29 @@ bramble.canvas.addEventListener( "keyup", function ( event ) {
   if ( event.repeat ) return;
 
   delete game.isKeyHeld[ event.key ];
-  var key = event.key.toLowerCase();
-  game.keyUp( key );
-  game.state.triggerEvent( "keyUp" , key );
+  bramble.onKeyUp.invoke( event.key.toLowerCase() );
 });
 
 // Mouse input
-game.mouseDown = function( x , y , button ) {};
-game.mouseUp   = function( x , y , button ) {};
-game.mouseMove = function( x , y ) {};
+bramble.onMouseMove = new Event(); // Parameters: x, y
+bramble.onMouseDown = new Event(); // Parameters: x, y, button
+bramble.onMouseUp = new Event(); // Parameters: x, y, button
+
+bramble._eventPointToCanvas = function(event) {
+  return event.pageX - bramble.canvas.offsetLeft, event.pageY - bramble.canvas.offsetTop;
+}
+
+bramble.canvas.addEventListener( "mousemove" , function ( event ) {
+  event.preventDefault();
+  bramble.onMouseMove.invoke( ...bramble._eventPointToCanvas( event ) );
+});
 
 bramble.canvas.addEventListener( "mousedown" , function ( event ) {
-  var x = event.pageX - bramble.canvas.offsetLeft;
-  var y = event.pageY - bramble.canvas.offsetTop;
-  game.mouseDown( x , y , event.button );
-  game.state.triggerEvent( "mouseDown" , x , y , event.button );
+  event.preventDefault();
+  bramble.onMouseDown.invoke( ...bramble._eventPointToCanvas( event ) , event.button );
 });
 
 bramble.canvas.addEventListener( "mouseup" , function ( event ) {
-  var x = event.pageX - bramble.canvas.offsetLeft;
-  var y = event.pageY - bramble.canvas.offsetTop;
-  game.mouseUp( x , y , event.button );
-  game.state.triggerEvent( "mouseUp" , x , y , event.button );
-});
-
-bramble.canvas.addEventListener( "mousemove" , function ( event ) {
-  var x = event.pageX - bramble.canvas.offsetLeft;
-  var y = event.pageY - bramble.canvas.offsetTop;
-  game.mouseMove( x , y );
-  game.state.triggerEvent( "mouseMove" , x , y );
+  event.preventDefault();
+  bramble.onMouseUp.invoke( ...bramble._eventPointToCanvas( event ) , event.button );
 });

@@ -15,3 +15,4 @@ game = {};
 game.asset = {};
 game.load = function() {};
 game.start = function() {};
+game.loop = function() {};

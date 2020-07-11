@@ -3,23 +3,22 @@ import re
 
 # Which files should be imported and and in which order
 fileNames = [
+    "object/event.js",
+    "object/entity.js",
+    "object/component.js",
+    # "object/system.js",
+    "object/vector.js",
+
     "core/init.js",
     "core/assets.js",
-    "core/state.js",
     "core/loop.js",
     "core/load.js",
     "core/start.js",
     "core/draw.js",
+    "core/audio.js",
     "core/input.js",
 
-    "object/vector.js",
-    "object/state.js",
-    "object/entity.js",
-    "object/component.js",
-    "object/ComponentGroupList.js",
-
-    "components.js",
-    "states.js",
+    "components.js"
 ]
 
 # Generate content of engine file

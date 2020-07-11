@@ -1,8 +1,6 @@
 // BRAMBLE LOAD //
 bramble.load = function() {
-
-  // Load game
-  game.load();
+  game.load(); // Call the user defined game load function
 
   // Append canvas to page
   bramble.canvas.style.width = bramble.canvas.width * bramble.pixelSize + "px";
@@ -12,10 +10,10 @@ bramble.load = function() {
 
   // Load assets
   if ( bramble.assetLoader.unloadedAssets.length > 0 ) {
+    bramble.assetLoader.onComplete.addListener(bramble.start);
     bramble.assetLoader.loadAssets();
-    if ( game.state.stack.length == 0 ) game.state.start( new BrambleLoadingState );
   } else {
     bramble.start();
   }
-  
+
 }

@@ -3,15 +3,10 @@ bramble.assetLoader = {};
 bramble.assetLoader.unloadedAssets = [];
 bramble.assetLoader.totalAssetCount = 0;
 bramble.assetLoader.loadedAssetCount = 0;
+bramble.assetLoader.onComplete = new Event();
 
 bramble.assetLoader.defaultImageType = "png";
 bramble.assetLoader.defaultSoundType = "mp3";
-
-// Callback function used by an asset when it loads
-bramble.assetLoader.assetLoadCallback = function () {
-  bramble.assetLoader.loadedAssetCount++;
-  if ( bramble.assetLoader.loadedAssetCount == bramble.assetLoader.totalAssetCount && !bramble.started ) bramble.start();
-}
 
 // Functions used to declare assets
 bramble.assetLoader.loadImages = function( assetNames , fileType ) {
@@ -71,4 +66,5 @@ bramble.assetLoader.loadAssets = function() {
     // Trigger the asset to load
     obj.src = assetInfo.src;
   }
+  bramble.assetLoader.onComplete.invoke();
 }
