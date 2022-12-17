@@ -11,6 +11,7 @@ fileNames = [
     "object/componentSignature.js",
     # "object/system.js",
     "object/vector.js",
+    "object/bitset.js",
 
     "core/init.js",
     "core/ecsComponentManager.js",
